@@ -16,7 +16,7 @@
 # Quellen
 #
 LSCRIPT = kernel.lds
-OBJ = start.o led.o
+OBJ = start.o main.o
 
 #
 # Konfiguration
