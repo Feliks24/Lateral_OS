@@ -1,0 +1,12 @@
+AT91RM9200 326 Debugunit transmitter
+	writing the control register DBGU_CR with the bit TXEN at 1 to enable transmitter
+	write into DBGU_THR
+
+	TXEN is apperantely 6 (p.438 manual)
+
+	DBGU_CR 0x0000
+	write this into DBGU_CR (0x1 << 6)
+	TXEN bit is 6
+
+	DBGU_THR 0x001C
+

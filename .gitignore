@@ -3,9 +3,6 @@
 *.o
 *.out
 *.d
-libset
-unlib
-notes
 
 # Mac VScode
 *.vscode/*

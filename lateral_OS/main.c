@@ -22,10 +22,9 @@ void yellow_on (void) {
 	write_u32 (DBGU_CR, ENABLE_THR);
 
 	//write to thr
-	write_u32(DBGU_THR,6);
-	_sleep();
+	write_u32(DBGU_THR,8);
 	while(1){
-		write_u32(DBGU_THR,'hello');
+		write_u32(DBGU_THR,123);
 	}
 
 }
