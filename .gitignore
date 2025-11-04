@@ -5,3 +5,7 @@
 *.d
 libset
 unlib
+
+# Mac VScode
+*.vscode/*
+*.DS_Store

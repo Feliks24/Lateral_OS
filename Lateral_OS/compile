@@ -3,7 +3,7 @@
 LD_LIBRARY_PATH=/usr/local/lib:/import/sage-7.4/local/lib/
 export LD_LIBRARY_PATH
 
-make && /home/mi/linnert/arm/bin/qemu-bsprak -kernel kernel
+make && /home/mi/linnert/arm/bin/qemu-bsprak -piotelnet -kernel kernel
 
 #restore library
 unset LD_LIBRARY_PATH
