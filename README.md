@@ -16,8 +16,11 @@ setting the library path breaks other programs such as vim
 There are now multiple scripts to avoid typing the full commands
 
 ./compile -> set lib, make, run qemu, unset lib
+
 ./gdb -> set lib, run gdb, unset lib
+
 ./qemu -> set lib, run qemu, unset lib
+
 ./libset and ./unlib
 
 ## Task specific execution
