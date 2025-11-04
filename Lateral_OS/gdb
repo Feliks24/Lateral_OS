@@ -1,0 +1,9 @@
+#!/bin/bash
+
+LD_LIBRARY_PATH=/usr/local/lib:/import/sage-7.4/local/lib/
+export LD_LIBRARY_PATH
+
+/home/mi/linnert/arm/bin/arm-none-eabi-gdb kernel
+
+unset LD_LIBRARY_PATH
+
