@@ -1,11 +1,9 @@
-#define PIOB 0xfffff600
-#define YELLOW_LED (1<<27)
-#define PIO_PER 0x00
-#define PIO_OER 0x10
-#define PIO_SODR 0x30
+#define DBGU_CR 0x0000
+#define DBGU_THR 0x001C
 
-//this apperently is needed to turn off the led
-#define PIO_CODR 0x34
+#define TXEN 6
+#define ENABLE_THR (0x1 << 6)
+
 
 
 static inline
@@ -20,16 +18,14 @@ void _sleep() {
 
 void yellow_on (void) {
 
-	write_u32 (PIOB + PIO_PER, YELLOW_LED);
-	write_u32 (PIOB + PIO_OER, YELLOW_LED);
-	write_u32 (PIOB + PIO_SODR, YELLOW_LED);
-	while(1){
-		//turn off LED - sleep - turn on - sleep
-		write_u32 (PIOB + PIO_CODR, YELLOW_LED);
-		_sleep();
-		write_u32 (PIOB + PIO_SODR, YELLOW_LED);
-		_sleep();
+	//enable thr
+	write_u32 (DBGU_CR, ENABLE_THR);
 
+	//write to thr
+	write_u32(DBGU_THR,6);
+	_sleep();
+	while(1){
+		write_u32(DBGU_THR,'hello');
 	}
 
 }

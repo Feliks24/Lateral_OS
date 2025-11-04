@@ -25,7 +25,7 @@ CC = /home/mi/linnert/arm/bin/arm-none-eabi-gcc
 LD = /home/mi/linnert/arm/bin/arm-none-eabi-ld
 OBJCOPY = /home/mi/linnert/arm/bin/arm-none-eabi-objcopy
 
-CFLAGS = -Wall -Wextra -ffreestanding -mcpu=arm920t -O2
+CFLAGS = -Wall -Wextra -ffreestanding -g -mcpu=arm920t
 #LIBGCC := $(shell $(CC) -print-libgcc-file-name)
 
 DEP = $(OBJ:.o=.d)
