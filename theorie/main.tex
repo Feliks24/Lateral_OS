@@ -3,6 +3,7 @@
 \input{structure.tex}
 \newcommand{\sheetNR}{0}
 
+\usepackage{graphicx}
 
 \begin{document}
 %Heading
@@ -14,13 +15,118 @@
 
 %----------start of document
 
-\section*{Exercise 1-1}
+\section*{Aufgabe 1-1(Architekturen)}
 
-Microkernel good, Makrokernel bad :(\\
+% * Aufgabenstellung --------------------------------------------------------------------------------------------------------------------------------------
 
-Testing
+\noindent
+Vorhandene Betriebssystementwürfe können grob in zwei Klassen eingeteilt werden:
+\begin{itemize}
+    \item Makrokernarchitektur
+    \item Mikrokernarchitektur
+\end{itemize}
+
+\noindent
+Diskutieren Sie beide Architekturansätze unter Zuhilfenahme mindestens der folgenden Quellen:
+
+\begin{itemize}
+    \item J. Liedtke, \textit{Toward Real µ-Kernels}, \textit{Communications of the ACM}, 39(9):70--77, September 1996.  
+    Verfügbar unter: \url{https://citeseerx.ist.psu.edu/pdf/64f7ffba964343a3fc91f870672459b619988d6c}
+    \item C. Maeda, B.N. Bershad, \textit{Networking Performance for Microkernels}, \textit{Proceedings of the Third Workshop on Workstation Operating Systems}, 13:154--159, April 1992.  
+    Verfügbar unter: \url{https://citeseerx.ist.psu.edu/pdf/4d5811e818391a007616b1ae881b1738d643e630}
+\end{itemize}
+
+\textbf{Aufbau Idee}
+
+% * --------------------------------------------------------------------------------------------------------------------------------------------------------
+
+% * Bearbeitung --------------------------------------------------------------------------------------------------------------------------------------------
+
+\begin{itemize}
+   \item Einleitung - Kurze Vorstellung beider Architekturen 
+   \item Makrokernel-Architektur - Aufbau und Funktionsweise - Vorteile (mit Bezug auf die Papers) - Nachteile (mit Bezug auf die Papers) 
+   \item Mikrokernel-Architektur - Aufbau und Funktionsweise - Vorteile (mit Bezug auf die Papers) - Nachteile (mit Bezug auf die Papers) - Liedtkes Verbesserungsvorschläge 
+   \item Vergleichende Diskussion - Performance-Vergleich - Sicherheitsaspekte - Praktische Anwendbarkeit 
+   \item Fazit - Abwägung der Trade-offs - Eigene Einschätzung
+\end{itemize}
+
+\section*{Lösung: }
+
+\noindent
+Der Kernel ist der Kern des Betriebssystems und stellt die grundlegende Infrastruktur bereit, die
+zwischen Hardware und Anwendungen vermittelt. Er bildet die privilegierte Softwareschicht,
+die die Hardware abstrahiert und die Grundkonzepte (Prozesse, Kommunikation) bereitstellt,
+auf denen das restliche Betriebssystem aufbaut.
+
+\subsubsection*{Makrokernarchitektur (Monolithischer Kernel)}
+
+\noindent
+Bei dem Makrokernarchitektur werden alle Services innerhalb des Kernels implementiert. Dies umfasst Scheduling, Dateisystem, Networking, Gerätetreiber, Speichermanagement und Paging.
+
+\paragraph{Vorteile}
+\begin{itemize}
+   \item Packtet werden vom Kernel direkt an den Adressraum des Empfängers gesendet. Dadurch müssen Pakete nicht wiederholt Kopiert werden. 
+   \item Die Eingabeverarbeitung (Input Processing) kann auf der Interrupt-Ebene erfolgen, was die Latenz reduziert. Um die Latenz auf ein Minimum zu reduzieren, können Teile des Protokolls im Interrupt-Handler des Kernels platziert werden, wodurch ein zusätzlicher Dispatch und RPC entfallen.
+\end{itemize}
+
+\paragraph{Nachteile}
+\begin{itemize}
+   \item Die TCB ist groß, da fast die gesamte Systemfunktionalität, einschließlich aller Treiber und Dienste, innerhalb des Kernels als absolut vertrauenswürdig implementiert werden muss
+   \item Monolithische Syteme sind weniger modular
+\end{itemize}
+
+\subsubsection*{Mikrokernarchitektur ($\mu$-Kernel)}
+
+\noindent
+Die Mikrokernalarchitektur basiert auf der Idee den Kernel zu minimieren, deshalb werden alle höheren Services auf die Nutzterebene verlagert. Der Kernel bietet nur essentielle Mechanismen wie Adressräume, Interprozesskommunikation (IPC) und grundlegendes Scheduling,
+\paragraph{Vorteile}
+\begin{itemize}
+   \item Das OS wird flexibler und modularer, es lassen sich Hard- und Software leichter anpassen und austauschen
+   \item Protokolle auf Benutzterebene lassen sich besser Anpassen und debugen als auf Kernelebene 
+   \item Eine Koexistenz verschiedener API's, File-Systeme oder sogar zusätzliche Betriebsysteme ist möglich.
+   \item Jeder Server läuft in seinem eigenen Adressraum, wodurch die Komponenten voneinander geschützt sind. Eine Fehlfunktion eines Servers ist isoliert, ähnlich wie bei einer normalen Anwendung. Dies reduziert die TCB
+   \item Durch die Schrumpfende Codebase gestaltet sich das wesentlich Wartbarer
+\end{itemize}
+
+\paragraph{Nachteile}
+\begin{itemize}
+   \item
+\end{itemize}
 
 
+\subsubsection*{Vergleich}
 
+\paragraph{Performance}
+
+Die Papers befassen sich viel mit der Leistung der verschiedenen Architekturansätzte. Wie die Papers aufzeigte war die These das Das Mikrokernalarchitektur, gegenüber der Makrokernarchitektur deutlich
+Ineffizienzer sei, dies zeigenten auch Tests einzelner Netzwerkprotokolle, wo die Mikrokernalarchitektur 2 bis 5 mal länger brauchten. Dies konnte jedoch auf die falsche Implemnetierung und nicht auf die Architektur 
+zurückgeführt werden.
+
+
+\begin{table}[h]
+\centering
+\resizebox{\textwidth}{!}{
+\begin{tabular}{|l|p{4cm}|p{5cm}|p{5cm}|}
+\hline
+\textbf{Aspekt} & \textbf{Makrokernel} & \textbf{Mikrokernel (1. Gen., Mach 3.0 / UX)} & \textbf{Mikrokernel (2. Gen., L4 / optimiertes Mach 3.0)} \\ \hline
+UDP RTT (Mach) & 4,8 ms & 19,5 ms (unoptimiert) & 4,2 ms (neuer, optimierter Server) \\ \hline
+Kosten IPC/RPC (486-DX50) & Unix Syscall: ca. 20 µs & Mach IPC: ca. 115 µs & L4 IPC: ca. 5 µs \\ \hline
+Ursache Ineffizienz & Gering & Schlechte Implementierungsstruktur (altes Kernel-Design im User-Space) & — \\ \hline
+\end{tabular}
+}
+\caption{Vergleich zwischen Makrokernel und Mikrokernel-Architekturen.}
+\label{tab:kernel-vergleich}
+\end{table}
+
+\paragraph{Sicherheitsaspekte}
+Die Mikrokernel-Architektur bietet klare Sicherheitsvorteile aufgrund der Kapselung.
+\begin{itemize}
+    \item TCB-Reduktion: Die TCB (Trusted Computing Base) wird im Mikrokernel-Ansatz stark reduziert, da viele Dienste und Treiber nicht mehr als absolut vertrauenswürdig im Kernel laufen müssen.
+    \item Fehlerisolation: Server-Fehlfunktionen sind isoliert. Ein Gerätetreiber kann beispielsweise nicht mehr Schaden anrichten als ein Editor.
+    \item Makrokernel-Risiko: Im Makrokernel muss die gesamte Funktionalität innerhalb der TCB als vertrauenswürdig betrachtet werden. Ein Fehler könnte das ganze System zum Absturz bringen.
+\end{itemize}
+
+
+% * -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 \end{document}
