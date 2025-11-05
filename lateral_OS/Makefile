@@ -16,7 +16,7 @@
 # Quellen
 #
 LSCRIPT = kernel.lds
-OBJ = start.o main.o
+OBJ = start.o debug_utils.o
 
 #
 # Konfiguration
