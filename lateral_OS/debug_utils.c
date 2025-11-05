@@ -33,7 +33,7 @@ void char_put(char _char)
 char char_get(void)
 {
 	// read the RHR register of DBGU unit
-	return (*((volatile char *)DBGU_REGISTER + DBGU_RHR));
+	return *((volatile char *)(DBGU_REGISTER + DBGU_RHR));
 }
 
 int my_printer(char *fmt, ...)
@@ -79,7 +79,7 @@ int my_printer(char *fmt, ...)
 			char_put(*str);
 			count++;
 		}
-		*str++;
+		str++;
 	}
 
 	va_end(args);
