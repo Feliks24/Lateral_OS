@@ -3,6 +3,7 @@
 *.o
 *.out
 *.d
+uni
 
 # Mac VScode
 *.vscode/*
