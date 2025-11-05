@@ -1,13 +1,23 @@
 #include "debug_utils.h"
 
+__attribute__((naked, section(".init"))) void _start(void)
+{
+	test_01();
+}
 
-__attribute__((naked, section(".init")))
-void _start(void) {
-	//start point of the system
-
+//testing differnt printInputs
+void test_01()
+{
+	// start point of the system
 	char_put('t');
-	while(1){
+
+	while (1)
+	{
 		char c = char_get();
-		char_put(c);
+		my_printer("Hello World!\n");
+		my_printer("Zahl in Hex: %x\n", 255);
+		my_printer("Pointer: %p\n", (void *)0xDEADBEEF);
+
+		my_printer("einfacher String \\%p\n");
 	}
 }
