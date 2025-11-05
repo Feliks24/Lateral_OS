@@ -1,23 +1,26 @@
 #include "debug_utils.h"
 
+
+
+
 __attribute__((naked, section(".init"))) void _start(void)
 {
-	test_01();
-}
-
-// testing differnt print
-void test_01()
-{
 	// start point of the system
-	char_put('t');
+	//char_put('t');
 
-	// get stuck here
-	while (1)
-	{
-		// actual strings
-		my_printer("Hello World!\n");
-		my_printer("Zahl in Hex: %x\n", 255);
-		my_printer("Pointer: %p\n", (void *)0xDEADBEEF);
-		my_printer("einfacher String \\%p\n");
-	}
+
+	unsigned int char1 = 97; //352 mod 255 = 97
+	//unsigned int char2 = 353; //352 mod 255 = 97
+	//unsigned int char3 = 353 + 256 +1;
+	//theorie beides ist 'a'
+
+	//%c works
+	//my_printer("97 to char: %c\n 353 to char: %c\n %c ",char1, char2, char3);
+	//const char* our_string = "testing";
+
+	//my_printer("this string: %s, and this is a char: %c", our_string, char3);
+	my_printer("test hex: %x",char1);
+	while(1);
 }
+
+
