@@ -25,11 +25,11 @@ There are now multiple scripts to avoid typing the full commands
 
 ## Task specific execution
 
-For Task 01 we compile run qemu with gdb and then connect gdb to check outputs
+We tested it with gdb but the current state is that you can just run compile
+and it sould work
 
 Terminal 1: $./compile
 
-Terminal 2: $./gdb $target remote :"current port"(1111, 1234)
 
 ## Latex
 
