@@ -35,6 +35,7 @@ void char_put(char _char)
 char char_get(void)
 {
 	// read the RHR register of DBGU unit
+	// RHR -> receive holding register
 	return *((volatile char *)(DBGU_REGISTER + DBGU_RHR));
 }
 
@@ -42,16 +43,27 @@ char char_get(void)
 void int_to_hex(unsigned int num){
 
 	const char *HEX_DIGITS = "0123456789ABCDEF";
+	char buffer[8];
+	int i = 0;
 
-	char_put('0');
-	char_put('x');
-	while(!num){
+	while(num && i < 8){
 		// take last bits
 		unsigned int nibble = num & 0xF;
 		//look up hex
-		char_put(HEX_DIGITS[nibble]);	
+		buffer[i] = HEX_DIGITS[nibble];
 		//shift to next bits
 		num = num >> 4;
+				//loop over chars in string
+		i++;
+	}
+
+	//start with 0x
+	char_put('0');
+	char_put('x');
+	//print buffer in correct order
+	while(i>0){
+		i--;
+		char_put(buffer[i]);
 	}
 
 }
@@ -80,10 +92,12 @@ int my_printer(char *fmt, ...)
 			switch (*str)
 			{
 			case 'c':
+				//just put char
 				char_put((char) va_arg(args, unsigned int));
 				break;
 			case 's': 
-				;
+				; //gcc has an issue with some label mmmm
+				//loop over chars in string
 				char *our_string= va_arg(args, const char*);
 
 				while(*our_string){
@@ -96,6 +110,8 @@ int my_printer(char *fmt, ...)
 				int_to_hex(va_arg(args, unsigned int));
 				break;
 			case 'p':
+				//assuming both unsigned int and void * have 4bytes
+				int_to_hex(va_arg(args, unsigned int));
 				break;
 			default:
 				// edge ignore, handel as char

@@ -18,3 +18,12 @@ AT91RM9200 326 Debugunit transmitter
 	DBGU_THR 0x001C (p.330  manual)
 		write into here
 
+
+For receiving
+	read from DBGU_RHR 0x0018 (p.330 manual)
+	DBGU_SR (status register)
+		0x0014 (p.330 manual)
+	bit RXRDY is set
+		check for 0x0 set to 1 (p.336 manual)
+	
+	if RXRDY is set read char print
