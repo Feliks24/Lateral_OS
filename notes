@@ -27,3 +27,7 @@ For receiving
 		check for 0x0 set to 1 (p.336 manual)
 	
 	if RXRDY is set read char print
+
+TODO after submission:
+	before putting into THR check for readyness
+	what happens if RHR is overfull? how to handle?
