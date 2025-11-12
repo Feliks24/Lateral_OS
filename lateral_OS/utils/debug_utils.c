@@ -3,6 +3,7 @@
 #define DBGU_REGISTER 0xFFFFF200
 #define DBGU_RHR 0x0018
 #define DBGU_THR 0x001C
+#define DBGU_SR 0x0014
 
 #define TXEN 6
 #define ENABLE_THR (0x1 << TXEN)
@@ -23,18 +24,17 @@ void _sleep(int test)
 
 void char_put(char _char)
 {
-	
-	// enable thr
-	// this is apparently not necessary
-	// write_u32 (DBGU_CR, ENABLE_THR);
 
+	//check if TXRDY is set at DBGU_SR
+	while( !(*(volatile int *)(DBGU_REGISTER+DBGU_SR) & (0x1<<1))){};
 	// write to the THR registry of the DBGU
 	write_u32(DBGU_REGISTER + DBGU_THR, _char);
 }
 
 char char_get(void)
 {
-	// read the RHR register of DBGU unit
+	//check if RXRDY is set at DBGU_SR
+	while(!(*(volatile int *)(DBGU_REGISTER+DBGU_SR)&0x1)){};
 	// RHR -> receive holding register
 	return *((volatile char *)(DBGU_REGISTER + DBGU_RHR));
 }

@@ -16,7 +16,7 @@
 # Quellen
 #
 LSCRIPT = kernel.lds
-OBJ = start.o debug_utils.o
+OBJ = start.o utils/debug_utils.o
 
 #
 # Konfiguration
@@ -26,6 +26,7 @@ LD = /home/mi/linnert/arm/bin/arm-none-eabi-ld
 OBJCOPY = /home/mi/linnert/arm/bin/arm-none-eabi-objcopy
 
 CFLAGS = -Wall -Wextra -ffreestanding -mcpu=arm920t -O2
+CFLAGS += -Iheaders/
 #CFLAGS += -g
 #LIBGCC := $(shell $(CC) -print-libgcc-file-name)
 

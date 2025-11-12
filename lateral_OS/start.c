@@ -1,7 +1,5 @@
 #include "debug_utils.h"
 
-#define DBGU_REGISTER 0xFFFFF200
-#define DBGU_SR 0x0014
 
 
 __attribute__((naked, section(".init"))) void _start(void)
@@ -19,12 +17,8 @@ __attribute__((naked, section(".init"))) void _start(void)
 	my_printer("hex of 97: %x\n",char1);
 
 	while(1){
-		//check SR register of DBGU for RXRDY bit 
-		if( *(volatile int *)(DBGU_REGISTER+DBGU_SR) & 0x1){
-			//if bit is set read the DBGU_RHR into c
-			char c = char_get();
-			my_printer("Read input: %c\n", c);
-		}
+		char c = char_get();
+		my_printer("Read input: %c\n", c);
 	}
 }
 
