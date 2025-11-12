@@ -71,7 +71,7 @@ void int_to_hex(unsigned int num){
 
 
 __attribute__((format(printf, 1, 2)))
-int my_printer(char *fmt, ...)
+int pprintf(char *fmt, ...)
 {
 
 	// va_list && va_start && va_end --> brauchen hier eigene Speicheradressen
@@ -86,9 +86,15 @@ int my_printer(char *fmt, ...)
 	{
 		// flags set
 		// ? % && (startingadress || last char was not \ )
-		if (*str == '%' && (str == fmt || *(str - 1) != '\\'))
+		if (*str == '%' && *(str - 1) != '\\')
 		{
 			str++;
+
+			if(!*str){
+				char_put('%');
+				break;
+			}
+
 			switch (*str)
 			{
 			case 'c':
