@@ -61,6 +61,6 @@ install: kernel.img
 
 .PHONY: clean
 clean:
-	rm -f kernel kernel.bin kernel.img
+	rm -f kernel.bin kernel.img
 	rm -f $(OBJ)
 	rm -f $(DEP)
