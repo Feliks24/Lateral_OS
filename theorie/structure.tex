@@ -76,12 +76,15 @@
 
 \usepackage{csquotes}
 
+\definecolor{linkblue}{rgb}{0.1,0.3,0.7}
+
 \usepackage[hidelinks]{hyperref} %Links to labeled formulas
 \hypersetup{
     colorlinks=true,
-    linkcolor=blue,
+    linkcolor=linkblue,
     filecolor=magenta,      
-    urlcolor=cyan,
+    urlcolor=linkblue,
+    citecolor=linkblue,
     pdftitle={Overleaf Example},
     pdfpagemode=FullScreen,
     }
@@ -98,7 +101,6 @@
 \usepackage{graphicx} % Subfigures
 \usepackage{subcaption}
 
-\usepackage{natbib}
 \usepackage{graphicx}
 \usepackage{tikz}
 \usetikzlibrary{arrows}
@@ -300,4 +302,5 @@
 	\end{mdframed}
 }
 
-
+\usepackage[backend=biber]{biblatex} 
+\addbibresource{example.bib}

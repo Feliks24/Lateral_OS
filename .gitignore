@@ -8,3 +8,11 @@ uni
 # Mac VScode
 *.vscode/*
 *.DS_Store
+
+#latex stuff
+*.bbl
+*.bcf
+*.bcf
+*.blg
+*.dvi
+*.xml

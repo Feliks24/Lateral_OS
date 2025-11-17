@@ -1,118 +1,46 @@
 \documentclass{article}
 
 \input{structure.tex}
-\newcommand{\sheetNR}{01}
+\newcommand{\sheetNR}{02}
 
 \usepackage{graphicx}
 
 \begin{document}
-%Heading
 \hrule\medskip\rule{0ex}{0ex}\\[-1ex]\noindent\large
-\textbf{Operating Systems: Sheet \sheetNR \space}\\[0.5ex]
+\textbf{Betriebssysteme: Sheet \sheetNR \space}\\[0.5ex]
 \normalsize{Feliks \& Bennet}
 
 \medskip\hrule\noindent\vskip 0.5cm
 
 %----------start of document
 
-\section*{Aufgabe 1-1(Architekturen)}
+\section*{Aufgabe \sheetNR-1(Threads)}
 
 % * Aufgabenstellung --------------------------------------------------------------------------------------------------------------------------------------
 
-\noindent
-Vorhandene Betriebssystementwürfe können grob in zwei Klassen eingeteilt werden:
-\begin{itemize}
-    \item Makrokernarchitektur
-    \item Mikrokernarchitektur
-\end{itemize}
+\noindent\textit{1.Wann is es sinnvoll, nebenläufige Programmteile mit Hilfe von Threads
+anstatt Prozessen zu implementieren?}
 
-\noindent
-Diskutieren Sie beide Architekturansätze unter Zuhilfenahme mindestens der folgenden Quellen:
+Dies und das \cite{gentry2008}
 
-\begin{itemize}
-    \item J. Liedtke, \textit{Toward Real µ-Kernels}, \textit{Communications of the ACM}, 39(9):70--77, September 1996.  
-    Verfügbar unter: \url{https://citeseerx.ist.psu.edu/pdf/64f7ffba964343a3fc91f870672459b619988d6c}
-    \item C. Maeda, B.N. Bershad, \textit{Networking Performance for Microkernels}, \textit{Proceedings of the Third Workshop on Workstation Operating Systems}, 13:154--159, April 1992.  
-    Verfügbar unter: \url{https://citeseerx.ist.psu.edu/pdf/4d5811e818391a007616b1ae881b1738d643e630}
-\end{itemize}
+\noindent\textit{2.Welche Vorteile bieten User-Level-Threads gegenüber den
+Kernel-Level-Threads? Gibt es auch Nachteile?}
 
-\section*{Lösung: }
+Lösung 2
 
-\noindent
-Der Kernel ist der Kern des Betriebssystems und stellt die grundlegende
-Infrastruktur bereit, die
-zwischen Hardware und Anwendungen vermittelt. Er bildet die privilegierte Softwareschicht,
-die die Hardware abstrahiert und die Grundkonzepte (Prozesse, Kommunikation) bereitstellt,
-auf denen das restliche Betriebssystem aufbaut.
+\noindent\textit{3.Welche Vorteile und Nachteile gibt es, wenn man
+Thread-Kntrolblücke(TCB) als Skalare, in Arrays, Listen, Bäumen oder
+invertierten Tabellen speichert?}
 
-\subsubsection*{Makrokernarchitektur (Monolithischer Kernel)}
-
-\noindent
-Bei dem Makrokernarchitektur werden alle Services innerhalb des Kernels
-implementiert. Dies kann Scheduling, Dateisystem, Networking,
-Gerätetreiber, Speichermanagement und Paging umfassen.
-
-\paragraph{Vorteile}
-\begin{itemize}
-   \item Packete werden vom Kernel direkt an den Adressraum des Empfängers
-	   gesendet. Dadurch müssen Pakete nicht wiederholt Kopiert werden. 
-   \item Die Eingabeverarbeitung (Input Processing) kann auf der
-	   Interrupt-Ebene erfolgen, was die Latenz reduziert. Um die Latenz
-	   auf ein Minimum zu reduzieren, können Teile des Protokolls im
-	   Interrupt-Handler des Kernels platziert werden, wodurch ein
-	   zusätzlicher Dispatch und RPC entfallen.
-  \item Bestimmte Services sind nicht angewiesen drauf Context Switches
-	  vorzunehmen, dadurch, dass sie auf Kernelebene platzieren sind
-\end{itemize}
-
-\paragraph{Nachteile}
-\begin{itemize}
-   \item Monolithische Syteme sind weniger modular
-   \item Potenziell unisicherer dadurch, dass viele Services Zugriff auf den
-	   Kernel haben
-\end{itemize}
-
-\subsubsection*{Mikrokernarchitektur ($\mu$-Kernel)}
-
-\noindent
-Die Mikrokernalarchitektur basiert auf der Idee den Kernel zu minimieren, deshalb werden mölichst viele Services auf die Nutzterebene verlagert. Der Kernel bietet nur essentielle Mechanismen wie Adressräume, Interprozesskommunikation (IPC) und grundlegendes Scheduling,
-\paragraph{Vorteile}
-\begin{itemize}
-   \item Das OS wird flexibler und modularer, es lassen sich Hard- und Software leichter anpassen und austauschen
-   \item Protokolle auf Benutzterebene lassen sich besser Anpassen und debugen als auf Kernelebene 
-   \item Eine Koexistenz verschiedener API's, File-Systeme oder sogar zusätzliche Betriebsysteme ist möglich.
-   \item Jeder Server läuft in seinem eigenen Adressraum, wodurch die Komponenten voneinander geschützt sind. Eine Fehlfunktion eines Servers ist isoliert, ähnlich wie bei einer normalen Anwendung. Dies reduziert die TCB
-   \item Durch die Schrumpfende Codebase gestaltet sich das wesentlich Wartbarer
-\end{itemize}
-
-\paragraph{Nachteile}
-\begin{itemize}
-   \item Programme übernehmen von exestierenden Macrokernelsystemen führ zu schlechter Performance dadurch, dass diese nicht der Art des Kernels angepasst sind
-   \item Eines der Paper zeigt, dass nach Optimierung der Programme Microkernels eine ähnliche Performance zeigen aber kritisiert:
-   \item Die Perfromance ist nicht wesentlich besser zu Macrokernels
-\end{itemize}
+Lösung 3
 
 
-\subsubsection*{Vergleich}
+\noindent\textit{4.In welchem Adressraum wird ein TCB gespeichert?}
 
-\paragraph{Performance}
-
-Die Papers befassen sich viel mit der Leistung der verschiedenen Architekturansätzte. Wie die Papers aufzeigte war die These das Das Mikrokernalarchitektur, gegenüber der Makrokernarchitektur deutlich
-Ineffizienzer sei, dies zeigenten auch Tests einzelner Netzwerkprotokolle, wo die Mikrokernalarchitektur 2 bis 5 mal länger brauchten. Dies konnte jedoch auf die falsche Implemnetierung und nicht auf die Architektur 
-zurückgeführt werden.
-
-
-
-
-\paragraph{Sicherheitsaspekte}
-Die Mikrokernel-Architektur bietet klare Sicherheitsvorteile aufgrund der Kapselung.
-\begin{itemize}
-    \item TCB-Reduktion: Die TCB (Trusted Computing Base) wird im Mikrokernel-Ansatz stark reduziert, da viele Dienste und Treiber nicht mehr als absolut vertrauenswürdig im Kernel laufen müssen.
-    \item Fehlerisolation: Server-Fehlfunktionen sind isoliert. Ein Gerätetreiber kann beispielsweise nicht mehr Schaden anrichten als ein Editor.
-    \item Makrokernel-Risiko: Im Makrokernel muss die gesamte Funktionalität innerhalb der TCB als vertrauenswürdig betrachtet werden. Ein Fehler könnte das ganze System zum Absturz bringen.
-\end{itemize}
-
+Lösung 4
 
 % * -------------------------------------------------------------------------------------------------------------------------------------------------------
+\newpage
+\printbibliography
 
 \end{document}
