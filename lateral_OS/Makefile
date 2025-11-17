@@ -16,7 +16,7 @@
 # Quellen
 #
 LSCRIPT = kernel.lds
-OBJ = start.o utils/debug_utils.o utils/remap_utils.o 
+OBJ = start.o utils/debug_utils.o utils/remap_utils.o
 
 #
 # Konfiguration

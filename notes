@@ -1,36 +1,65 @@
-AT91RM9200 326 Debugunit transmitter
-	Old:
-		writing the control register DBGU_CR with the bit TXEN at 1 to enable transmitter
-		write into DBGU_THR
+TODO:
 
-		TXEN is apperantely 6 (p.438 manual)
+theorie
 
-		DBGU_CR 0x0000
-		write this into DBGU_CR (0x1 << TXEN)
+Lateral_OS
+1.memory remap 
+2.set up stacks
+3.IVT (handler)
+4.testen von handler
 
-	New:
+Usermodi (Folien Seite 9)
+	User 	10000
+	FIQ  	10001
+	IRQ  	10010
+	Supervisor
+	     	10011
+	Abort	10111
+	Undefined 11011
+	System 	11111
 
-	basicly just write into DBGU base register + THR register
-	there's also a receive register DBGU_RHR which we will use
-	DBGU register 0xFFFFF200 (p.17 manual)
-	DBGU_RHR 0x0018 
-		read from here
-	DBGU_THR 0x001C (p.330  manual)
-		write into here
+IVC adresses (Slide 4 Folie 15 )
 
+Reihenfolge von Ausnahmen(slide 4 folie 18)
+	1.Reset
+		-> prozessabbruch 
+	2.Data abort
+		-> prozessabbruch?
+	3.FIQ
+		-> fortsetzung
+	4.IRQ
+		-> fortsetzung
+	5. Prefetch abort
+		-> prozessabbruch?
+	7.software interrupt
+		-> 
+	6.Undefined instr
+		-> prozessabbruch?
 
-For receiving
-	read from DBGU_RHR 0x0018 (p.330 manual)
-	DBGU_SR (status register)
-		0x0014 (p.330 manual)
-	bit RXRDY is set
-		check for 0x0 set to 1 (p.336 manual)
+	data abort, prefetch abort, undefined inst ??
+
+R13 stack pointer
+R14 Link register
+R15 Program Counter
+CPSR and SPSR separate
+
+Assembler in folie 4 ende
+
+set mode back and pc simaltanously(handler)
+	set modi in SPSR (saved program status registry)
+	use SUBS PC, LR, #4
+	or  SUBS PC, LR, #8
 	
-	if RXRDY is set read char print
+	SUBS is SUB with S-bit set(suffix)
+	S-bit set + PC as target => SPSR moved to CPSR(current program 
+	status registry)
+	
+malloc(...)
+-> memory allocation
+free()
 
-TODO after submission:
-	before putting into THR check for readyness
-	what happens if RHR is overfull? how to handle?
+malloc some space for stack somewhere?
+and set SP for each mode to each stack
 
 
 Theorie 2
@@ -82,3 +111,4 @@ Kernel-Level-Threds:
 - Es gibt verschiede ansehensweisen in Operationssystemen 
 - Das zusammenführen unter mehreren Attributwerten unter subsets ist sinnvoll (Thread-Zustand, Prio,)
 - Threads müssen so oder so nach ready oder waiting organisiert werden  
+
