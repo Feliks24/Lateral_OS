@@ -32,6 +32,7 @@ __attribute__((naked, section(".init"))) void _start(void)
 	const char* our_string = "testing";
 	pprintf("this string: %s\n", our_string);
 	// step 2: IVT
+	//schreibne auf 0x00000000 IVT
 
 	// step 3: stack
 
