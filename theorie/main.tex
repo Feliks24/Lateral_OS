@@ -12,35 +12,117 @@
 
 \medskip\hrule\noindent\vskip 0.5cm
 
-%----------start of document
 
 \section*{Aufgabe \sheetNR-1(Threads)}
 
-% * Aufgabenstellung --------------------------------------------------------------------------------------------------------------------------------------
 
-\noindent\textit{1.Wann is es sinnvoll, nebenläufige Programmteile mit Hilfe von Threads
-anstatt Prozessen zu implementieren?}
+\vspace{0.5cm} \noindent \textit{1.Wann is es sinnvoll, nebenläufige
+Programmteile mit Hilfe von Threads anstatt Prozessen zu implementieren?}
+\vspace{0.5cm}
 
-Dies und das \cite{gentry2008}
+Context Switches zwischen Threads sind einfach als zwischen Prozessen. Man
+benötigt außerdem keine Interprocess Communication um Daten zu teilen und
+erspart sich somit Kommunikationsaufwand. 
 
-\noindent\textit{2.Welche Vorteile bieten User-Level-Threads gegenüber den
-Kernel-Level-Threads? Gibt es auch Nachteile?}
+Quelle: Betriebssysteme Vorlesung, Betriebs- und Kommunikationssysteme
 
-Lösung 2
+\vspace{0.5cm}\noindent\textit{2.Welche Vorteile bieten User-Level-Threads
+gegenüber den Kernel-Level-Threads? Gibt es auch Nachteile?}\vspace{0.5cm}
 
-\noindent\textit{3.Welche Vorteile und Nachteile gibt es, wenn man
-Thread-Kntrolblücke(TCB) als Skalare, in Arrays, Listen, Bäumen oder
-invertierten Tabellen speichert?}
+Man braucht keine Unterstützung durch das Betriebssystem. Somit braucht nicht
+jeder User-Level-Thread ein separaten TCB. Weiterhin hat man umso weniger
+Aufwand von User-Level-Threads, zumindest aus der Perspektive des
+Betriebssystemes, da die Implementierung des Switches vom User abhängt.
 
-Lösung 3
+
+\vspace{0.5cm}\noindent\textit{3.Welche Vorteile und Nachteile gibt es, wenn
+man Thread-Kntrolblücke(TCB) als Skalare, in Arrays, Listen, Bäumen oder
+invertierten Tabellen speichert?}\vspace{0.5cm}
+
+Skalare
+\begin{itemize}
+\item[+] Direkter Zugriff auf TCBs
+\item[+] Leicht TCB zu entfernen, eventuell einfach Speicher frei geben
+\item[-] Man hat keine Sortierung
+\item[-] Man hält viele separate Variablen, mit den es möglicherweiße schwer
+	ist umzugehen, vorallem wenn die Anzahl an Threads dynamisch ist
+\end{itemize}
+
+Arrays
+\begin{itemize}
+\item[+] Eine Struktur die alle TCBs hat 
+\item[+] Man hat die Möglichkeit direkt auf einen TCB zuzugreifen so lange man
+	weiß wo in der List, wo die Implementierung nicht kompliziert sein
+	müsste
+\item[+] Man kann nach einer Eigenschaft sortieren und finden in $\mathcal{O}(n)$
+\item[-] Sollte man Sortieren so ist das Einfügen und Entfernen von TCBs
+	$\mathcal{O}(n)$, also eher ineffizient
+\item[-] Array Länge ist statisch heißt um beliebig viele Threads zu
+	unterstützen müsste man eine Lösung dazu implementieren z.B. dynamische
+	Arrays oder möglicherweiße Pointer zu einer weiteren Arrays.
+\end{itemize}
+
+Listen (vermutlich ist hiermit eine linked List gemeint)
+\begin{itemize}
+\item[+] Eine Struktur die alle TCBs hat 
+\item[+] Sortierbarkeit
+\item[+] Dynamische Länge
+\item[+] Man kann Stacks und Queues damit implementieren, für Queues braucht
+	man einfach ein zweiten Pointer auf das Ende
+\item[+-] Beim Entfernen von TCBS braucht man $\mathcal{O}(n)$ um zu finden aber
+	$\mathcal{O}(1)$ um zu löschen
+\item[-] Kein direkter Zugriff
+\item[-] Einsortierung und Finden braucht worst case $\mathcal{O}(n)$
+\item[-] Extra Speicheraufwand für Pointer allerdings immernoch in
+	$\mathcal{O}(n)$ was asymptotisch gut ist
+\end{itemize}
+
+Bäume
+\begin{itemize}
+\item[+] Eine Struktur die alle TCBs hat 
+\item[+] Sortierbarkeit
+\item[+] Dynamische Menge an Elementen
+\item[+] Einfügen, Entfernen und Finden ist in average case
+	$\mathcal{O}(log(n))$ möglich
+\item[-] Erfordert Implementierung, vor allem Komplexität wenn man Elemente
+	Entfernt
+\item[-] Wenn man schlecht balancierte Bäume hat erfordert es noch mehr
+	Komplexität der Implementierung
+\item[-] Extra Speicheraufwand für Pointer allerdings immernoch in
+	$\mathcal{O}(n)$ was asymptotisch gut ist
+\item[-] Kein direkter Zugriff
+\end{itemize}
+
+invertierte Tabellen
+\begin{itemize}
+\item[+] Eine Struktur die alle TCBs hat 
+\item[+] Direkter Zugriff auf Attribut eines bestimmtes TCBs, somit braucht man
+	nicht das gesamte TCB laden
+\item[+-] Wenn nicht sortiert dann braucht Einfügen, Finden, Löschen
+	$\mathcal{O}(m)$ abhängig von Menge an Attribute bzw $\mathcal{O}(1)$
+	wenn man annimmt das Anzahl an Attributen beliebig Groß aber Konsitent
+	ist
+\item[+-] Sortierbarkeit aber nur nach einem Attribut, wobei Sortierung extra
+	Aufwand braucht
+\item[-] Einfügen und Löschen von TCBs braucht mehrere separate schreib
+	Operationen
+\item[-] Größe ist nicht dynamisch, bzw würde extra Implementierung erfordern
+\end{itemize}
+Quelle: Algorithmen und Datenstrukturen, Höhere Algorithmen
 
 
-\noindent\textit{4.In welchem Adressraum wird ein TCB gespeichert?}
+\vspace{0.5cm} \noindent\textit{4.In welchem Adressraum wird ein TCB
+gespeichert?} \vspace{0.5cm}
 
-Lösung 4
+TCBs als auch PCBs sollen beide im Kernel Speicher liegen.
 
-% * -------------------------------------------------------------------------------------------------------------------------------------------------------
-\newpage
-\printbibliography
+Möglicherweiße können TCBs von User Level Threads im Prozess eigenen
+Speicherbereich gehalten werden, die Quellen zu dieser Aussage sind allerdings
+spärlich. Wobei es dann drauf ankommt wie die User-Level Threads implementiert
+sind und ob überhaupt User-Level TCBs benötigt werden
+
+
+%\newpage
+%\printbibliography
 
 \end{document}
