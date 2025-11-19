@@ -16,7 +16,6 @@ uni
 *.blg
 *.dvi
 *.xml
-*.dvi
 *.fdb_latexmk
 *.fls
 *.run.xml
