@@ -19,11 +19,12 @@ void singular_stack_set(unsigned int mode,void * address)
 	asm volatile(
 		"mrs r2, cpsr\n"
 		"bic r3,r2, #0x1f\n"
-		"orr r3,r3,%0\n" : "r" (mode):
+		"orr r3,r3,%0\n" 
 		"msr cpsr_c, r3\n"
-		"mov sp, %0\n" : "r" (address):
+		"mov sp, %1\n" 
 		"msr cpsr_c, r2\n"
 		"mov pc, lr\n"
+		:: "r" (mode), "r" (address)
 	);
 
 }

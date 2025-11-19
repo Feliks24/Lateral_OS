@@ -42,7 +42,8 @@ __attribute__((naked, section(".init"))) void _start(void)
 	pprintf("this string: %s\n", our_string);
 
 	// step 4: test handler
-	asm("swi #0");
+	*(int *) 0x00400029 = 0;
+	//asm("swi #0");
 
 	for (;;)
 	{
