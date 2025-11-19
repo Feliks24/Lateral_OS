@@ -13,6 +13,7 @@ __attribute__((naked, section(".init"))) void _start(void)
 	pprintf("97 to char: %c\n353 to char: %c\n",char1, char2);
 	const char* our_string = "testing";
 
+	pprintf("this string: %s\n", our_string);
 	pprintf("hex of 97: %x\n",char1);
 	pprintf("check \\% and also %\n");
 
@@ -29,8 +30,6 @@ __attribute__((naked, section(".init"))) void _start(void)
 	// step 1: remap memory
 	memory_remap();
 
-	const char* our_string = "testing";
-	pprintf("this string: %s\n", our_string);
 	// step 2: IVT
 
 	// step 3: stack

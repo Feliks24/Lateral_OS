@@ -22,22 +22,55 @@
 anstatt Prozessen zu implementieren?}
 
 Dies und das \cite{gentry2008}
+% ? https://www.ibm.com/docs/de/aix/7.3.0?topic=programming-understanding-threads-processes
+% ? https://www.youtube.com/watch?v=TGgUEamLvGs
 
-\noindent\textit{2.Welche Vorteile bieten User-Level-Threads gegenüber den
-Kernel-Level-Threads? Gibt es auch Nachteile?}
+Ein Programm (Prozess) besitzt mindestens einen Thread. 
+Die Nutzung von weiteren Threads ist dann sinnvoll, wenn eine schnellere Prozessausführung innerhalb des selben Prozesses gewünscht ist, 
+welche den gleichen Adressraum teilen. Diese ist bei einem Multikernsystem durch parallelisierung von mehrern Threads möglich. 
+Durch die leichtgewichtigkeit eines Threads kann es schneller zur Erstellung und gewünschten Kontextwechsels kommen. Durch das Teilen des Adressraums 
+können Daten untereinander ausgetauscht werden.
 
-Lösung 2
+\noindent\textit{2.Welche Vorteile bieten User-Level-Threads gegenüber den Kernel-Level-Threads? Gibt es auch Nachteile?}
 
-\noindent\textit{3.Welche Vorteile und Nachteile gibt es, wenn man
-Thread-Kntrolblücke(TCB) als Skalare, in Arrays, Listen, Bäumen oder
-invertierten Tabellen speichert?}
+% ? https://www.youtube.com/watch?v=sCDRghC4_AI&t=232s
+% ? https://www.tutorialspoint.com/user-level-threads-and-kernel-level-threads
+% ? https://www.ibm.com/docs/kk/aix/7.2.0?topic=processes-kernel-threads-user-threads
 
-Lösung 3
+Die Funktion der beiden Thread-Arten unterscheidet sich, daher gehen die eigentlichen Vor- und Nachteile aus der Verwendung hervor.
+Voreile eines User-Level-Threads für die Enwicklung ist die Lenkbarkeuit und der Zugriff über eine einheiltlcihe Thread-Libary. Die erstellten
+Threads sind schneller, einfacher zu erstellen zu steuern und zu mangen. Sie funktionieren Plattformunabhängig und benötigen keine Kernel mode priviliegien 
+um einen Kontextwechsel vorzunehmen. 
+Das Kernel weiß nichts von den verschiedenen Threds aus User-Level und behandelt die Prozesse wie eine eine single-Thread-Application, das kann zu Nachteilen führen. Das 
+Multithreading kann nicht zum Vorteil der Anwendung genutzt werden. Falls ein User-Level-Thread eine Blockieroperation, wird der gesammte Prozess blockiert. Dies kann bei einem 
+Kernel-Level-Thread nicht passieren Multithreading könenn über das Kernel geschedulart werden und bei der Blockierung eines Threads, kann ein anderer Thread innerhalb des Prozesses mit der 
+Operastion vortfahren.
+
+
+
+\noindent\textit{3.Welche Vorteile und Nachteile gibt es, wenn man Thread-Kontrollblock(TCB) als Skalare, in Arrays, Listen, Bäumen oder invertierten Tabellen speichert?}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{l p{5cm} p{6cm}}
+\hline
+\textbf{Struktur} & \textbf{Vorteil} & \textbf{Nachteil} \\
+\hline
+Skalar & Einfache Implementierung & Unterstützt keine Mehrfach-Threads \\
+Array & Schneller Indexzugriff, gut für feste Prioritäten & Unflexibel, schlecht bei dynamischer Anzahl \\
+Liste & Einfaches Einfügen/Löschen & Langsame Suche, langsam bei prioritätsbasiertem Scheduling \\
+Baum & Sehr gut für Prioritäten, schnelle Operationen (O(log n)) & Komplexe Implementierung, zusätzlicher Overhead \\
+Invertierte Tabelle & Schneller Lookup über ID → TCB & Benötigt Hashing oder direkte Indexierung, Kollisionsgefahr \\
+\hline
+\end{tabular}
+\caption{Vergleich von Datenstrukturen zur Speicherung von TCBs}
+\end{table}
+
 
 
 \noindent\textit{4.In welchem Adressraum wird ein TCB gespeichert?}
 
-Lösung 4
+Der TCB eines Kernel-Threads wird im Kernel-Adressraum gespeichert, typischerweise im Kernelspeicher des Betriebssystems. Sie können auch durch Kerneloperationen gesteuert und gemanged werden.
 
 % * -------------------------------------------------------------------------------------------------------------------------------------------------------
 \newpage

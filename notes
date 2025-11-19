@@ -1,65 +1,84 @@
-TODO:
+AT91RM9200 326 Debugunit transmitter
+	Old:
+		writing the control register DBGU_CR with the bit TXEN at 1 to enable transmitter
+		write into DBGU_THR
 
-theorie
+		TXEN is apperantely 6 (p.438 manual)
 
-Lateral_OS
-1.memory remap 
-2.set up stacks
-3.IVT (handler)
-4.testen von handler
+		DBGU_CR 0x0000
+		write this into DBGU_CR (0x1 << TXEN)
 
-Usermodi (Folien Seite 9)
-	User 	10000
-	FIQ  	10001
-	IRQ  	10010
-	Supervisor
-	     	10011
-	Abort	10111
-	Undefined 11011
-	System 	11111
+	New:
 
-IVC adresses (Slide 4 Folie 15 )
+	basicly just write into DBGU base register + THR register
+	there's also a receive register DBGU_RHR which we will use
+	DBGU register 0xFFFFF200 (p.17 manual)
+	DBGU_RHR 0x0018 
+		read from here
+	DBGU_THR 0x001C (p.330  manual)
+		write into here
 
-Reihenfolge von Ausnahmen(slide 4 folie 18)
-	1.Reset
-		-> prozessabbruch 
-	2.Data abort
-		-> prozessabbruch?
-	3.FIQ
-		-> fortsetzung
-	4.IRQ
-		-> fortsetzung
-	5. Prefetch abort
-		-> prozessabbruch?
-	7.software interrupt
-		-> 
-	6.Undefined instr
-		-> prozessabbruch?
 
-	data abort, prefetch abort, undefined inst ??
-
-R13 stack pointer
-R14 Link register
-R15 Program Counter
-CPSR and SPSR separate
-
-Assembler in folie 4 ende
-
-set mode back and pc simaltanously(handler)
-	set modi in SPSR (saved program status registry)
-	use SUBS PC, LR, #4
-	or  SUBS PC, LR, #8
+For receiving
+	read from DBGU_RHR 0x0018 (p.330 manual)
+	DBGU_SR (status register)
+		0x0014 (p.330 manual)
+	bit RXRDY is set
+		check for 0x0 set to 1 (p.336 manual)
 	
-	SUBS is SUB with S-bit set(suffix)
-	S-bit set + PC as target => SPSR moved to CPSR(current program 
-	status registry)
-	
+	if RXRDY is set read char print
+
+TODO after submission:
+	before putting into THR check for readyness
+	what happens if RHR is overfull? how to handle?
 
 
-malloc(...)
--> memory allocation
-free()
+Theorie 2
 
-malloc some space for stack somewhere?
-and set SP for each mode to each stack
+1. Wann is es sinnvoll, nebenläufige Programmteile mit Hilfe von Threads anstatt Prozessen zu implementieren?
 
+Thread:
+- Planbare Einheit/Entität
+- Hat nur erforderliche Eigenschaften: Stack, PC (Programm counter) (z. B. Richtlinie oder Priorität), Gruppe anstehender und blockierter Signale, Einige threadspezifische Daten
+- Leichtgewichtig
+- Alle threads benutzten gemeinsam einen Adressraum (Wenn beispielsweise ein Thread eine Datei schließt, wird die Datei für alle Threads geschlossen).
+
+Prozess
+- Änderbar Entitöt
+- Ausführungsrahmen 
+- Eigenschaften: Prozess-ID, Prozessgruppen-ID, Benutzer-ID und Gruppen-ID, Umgebung, Arbeitsverzeichnis
+- Prozess stellt einen Adressraum und Systemressourcen bereit 
+
+- Ein Prozess hat 1* Threads. 
+- Threads führen das selbe Programm (Prozess) aus und teilen sich gemeinsame Variblen
+- Threads sind priorisierbar 
+- Bei Multikernsystemen tatsächliche paralleausführung von Threads möglich, sonst simulation durch ständiges Konten wechseln
+
+2. Welche Vorteile bieten User-Level-Threads gegenüber den Kernel-Level-Threads? Gibt es auch Nachteile?
+
+
+User-Level-Threads:
+- Kernel weiß nichts von ihnen -> behandelt multi-thread Programme als singel-thread Programme
+- Ist steuerbar von Entwicklern und zugreifbar (api) über die thread libaray
+- Sind einfacher und schneller zu erstellen und einfacher zu mangen 
+- Sind unabhängig von os -> können auf jeden system laufen
+- Keine kernel mode Privilegs zum Kontext wechsle 
+
+- Multithreading kann nicht wirklich zum Vorteil genutzt werden auf userebene
+- Der ganze Prozess wird blockiert wenn ein thread sorgt für eine Blockieroperation
+
+Kernel-Level-Threds:
+- Kontext Wechsel ist teurer
+- Limitiert vom kernel
+- Weniger flexibel in scheduling -> gesteuert vom Kernel (system-Schedular handhabt die threads)
+- Kernel operationen können multithreaded werden 
+- Wenn eine kernel thread blockiert, kann ein anderer thread in dem Prozess weitermachen 
+- Außerhalb des kernels (kernel-extensions, driver) nicht benutzbar bei Entwicklern 
+
+3. Welche Vorteile und Nachteile gibt es, wenn man Thread-Kontrollblock(TCB) als Skalare, in Arrays, Listen, Bäumen oder invertierten Tabellen speichert?
+
+
+- In großen Systemen ist ein effizientes mangen und datenstrucktur für threads notwendig 
+- Es gibt verschiede ansehensweisen in Operationssystemen 
+- Das zusammenführen unter mehreren Attributwerten unter subsets ist sinnvoll (Thread-Zustand, Prio,)
+- Threads müssen so oder so nach ready oder waiting organisiert werden  
