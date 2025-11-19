@@ -12,31 +12,34 @@
 
 \medskip\hrule\noindent\vskip 0.5cm
 
+
 %----------start of document
 
 \section*{Aufgabe \sheetNR-1(Threads)}
 
 % * Aufgabenstellung --------------------------------------------------------------------------------------------------------------------------------------
 
-\noindent\textit{1.Wann is es sinnvoll, nebenläufige Programmteile mit Hilfe von Threads
+\subsubsection*{1.Wann is es sinnvoll, nebenläufige Programmteile mit Hilfe von Threads
 anstatt Prozessen zu implementieren?}
 
-Dies und das \cite{gentry2008}
+% Dies und das \cite{gentry2008}
 % ? https://www.ibm.com/docs/de/aix/7.3.0?topic=programming-understanding-threads-processes
 % ? https://www.youtube.com/watch?v=TGgUEamLvGs
 
+\noindent
 Ein Programm (Prozess) besitzt mindestens einen Thread. 
 Die Nutzung von weiteren Threads ist dann sinnvoll, wenn eine schnellere Prozessausführung innerhalb des selben Prozesses gewünscht ist, 
 welche den gleichen Adressraum teilen. Diese ist bei einem Multikernsystem durch parallelisierung von mehrern Threads möglich. 
 Durch die leichtgewichtigkeit eines Threads kann es schneller zur Erstellung und gewünschten Kontextwechsels kommen. Durch das Teilen des Adressraums 
 können Daten untereinander ausgetauscht werden.
 
-\noindent\textit{2.Welche Vorteile bieten User-Level-Threads gegenüber den Kernel-Level-Threads? Gibt es auch Nachteile?}
+\subsubsection*{2. Welche Vorteile bieten User-Level-Threads gegenüber den Kernel-Level-Threads? Gibt es auch Nachteile?}
 
 % ? https://www.youtube.com/watch?v=sCDRghC4_AI&t=232s
 % ? https://www.tutorialspoint.com/user-level-threads-and-kernel-level-threads
 % ? https://www.ibm.com/docs/kk/aix/7.2.0?topic=processes-kernel-threads-user-threads
 
+\noindent
 Die Funktion der beiden Thread-Arten unterscheidet sich, daher gehen die eigentlichen Vor- und Nachteile aus der Verwendung hervor.
 Voreile eines User-Level-Threads für die Enwicklung ist die Lenkbarkeuit und der Zugriff über eine einheiltlcihe Thread-Libary. Die erstellten
 Threads sind schneller, einfacher zu erstellen zu steuern und zu mangen. Sie funktionieren Plattformunabhängig und benötigen keine Kernel mode priviliegien 
@@ -46,10 +49,10 @@ Multithreading kann nicht zum Vorteil der Anwendung genutzt werden. Falls ein Us
 Kernel-Level-Thread nicht passieren Multithreading könenn über das Kernel geschedulart werden und bei der Blockierung eines Threads, kann ein anderer Thread innerhalb des Prozesses mit der 
 Operastion vortfahren.
 
+\subsubsection*{3.Welche Vorteile und Nachteile gibt es, wenn man Thread-Kontrollblock(TCB) als Skalare, in Arrays, Listen, Bäumen oder invertierten Tabellen speichert?}
 
-
-\noindent\textit{3.Welche Vorteile und Nachteile gibt es, wenn man Thread-Kontrollblock(TCB) als Skalare, in Arrays, Listen, Bäumen oder invertierten Tabellen speichert?}
-
+\medskip
+\noindent
 \begin{table}[h!]
 \centering
 \begin{tabular}{l p{5cm} p{6cm}}
@@ -68,12 +71,13 @@ Invertierte Tabelle & Schneller Lookup über ID → TCB & Benötigt Hashing oder
 
 
 
-\noindent\textit{4.In welchem Adressraum wird ein TCB gespeichert?}
+\subsubsection*{4.In welchem Adressraum wird ein TCB gespeichert?}
 
+\noindent
 Der TCB eines Kernel-Threads wird im Kernel-Adressraum gespeichert, typischerweise im Kernelspeicher des Betriebssystems. Sie können auch durch Kerneloperationen gesteuert und gemanged werden.
 
 % * -------------------------------------------------------------------------------------------------------------------------------------------------------
 \newpage
-\printbibliography
+%\printbibliography
 
 \end{document}
