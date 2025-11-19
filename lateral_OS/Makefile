@@ -28,7 +28,7 @@ OBJCOPY = /home/mi/linnert/arm/bin/arm-none-eabi-objcopy
 
 CFLAGS = -Wall -Wextra -ffreestanding -mcpu=arm920t -O2
 CFLAGS += -Iheaders/
-#CFLAGS += -g
+CFLAGS += -g
 #LIBGCC := $(shell $(CC) -print-libgcc-file-name)
 
 DEP = $(OBJ:.o=.d)
