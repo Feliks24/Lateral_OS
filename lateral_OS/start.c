@@ -1,5 +1,6 @@
 #include "debug_utils.h"
 #include "remap_utils.h"
+#include "set_ivt.h"
 
 // TASK 01
 /*
@@ -29,14 +30,18 @@ __attribute__((naked, section(".init"))) void _start(void)
 	// step 1: remap memory
 	memory_remap();
 
-	const char* our_string = "testing";
-	pprintf("this string: %s\n", our_string);
 	// step 2: IVT
-	//schreibne auf 0x00000000 IVT
+	set_ivt();
 
 	// step 3: stack
+	set_stacks();
+
+
+	const char* our_string = "testing";
+	pprintf("this string: %s\n", our_string);
 
 	// step 4: test handler
+	asm("swi #0");
 
 	for (;;)
 	{
