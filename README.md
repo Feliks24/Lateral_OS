@@ -2,6 +2,10 @@
 
 by Feliks & Bennet
 
+## Task 02
+
+Sadly we didn't get Task 2 to run
+
 ## Compiling
 
 The envirnonment assumes that we're working on the andorra server, and

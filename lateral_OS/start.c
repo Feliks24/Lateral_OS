@@ -28,6 +28,8 @@ __attribute__((naked, section(".init"))) void _start(void)
 // TASK 02
 __attribute__((naked, section(".init"))) void _start(void)
 {
+
+
 	// step 1: remap memory
 	memory_remap();
 
@@ -38,12 +40,13 @@ __attribute__((naked, section(".init"))) void _start(void)
 	init_stack();
 
 
-	const char* our_string = "testing";
-	pprintf("this string: %s\n", our_string);
 
 	// step 4: test handler
 	*(int *) 0x00400029 = 0;
 	//asm("swi #0");
+
+	const char* our_string = "testing";
+	pprintf("this string: %s\n", our_string);
 
 	for (;;)
 	{
