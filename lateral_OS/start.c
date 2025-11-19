@@ -1,6 +1,7 @@
 #include "debug_utils.h"
 #include "remap_utils.h"
 #include "set_ivt.h"
+#include "init_stack.h"
 
 // TASK 01
 /*
@@ -34,7 +35,7 @@ __attribute__((naked, section(".init"))) void _start(void)
 	set_ivt();
 
 	// step 3: stack
-	set_stacks();
+	init_stack();
 
 
 	const char* our_string = "testing";
