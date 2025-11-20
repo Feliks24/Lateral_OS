@@ -19,7 +19,7 @@ void set_ivt(void)
 	
 	size_t ivt_size = ivt_end - ivt_start;
 
-	pprintf("%p\n", (void *) ivt_size);
+	//pprintf("%p\n", (void *) ivt_size);
 	size_t i;
 	for(i = 0; i <= ivt_size; i++)
 	{

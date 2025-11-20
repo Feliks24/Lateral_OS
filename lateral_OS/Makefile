@@ -17,7 +17,7 @@
 #
 LSCRIPT = kernel.lds
 OBJ = start.o utils/debug_utils.o utils/remap_utils.o utils/set_ivt.o
-OBJ += utils/vector_table.o utils/init_stack.o
+OBJ += utils/vector_table.o utils/init_stack.o utils/asm_stack.o
 
 #
 # Konfiguration

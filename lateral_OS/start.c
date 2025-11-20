@@ -42,8 +42,9 @@ __attribute__((naked, section(".init"))) void _start(void)
 
 
 	// step 4: test handler
-	*(int *) 0x00400029 = 0;
-	//asm("swi #0");
+	//*(int *) 0x00400029 = 0;
+	pprintf("now testing software interrupt");
+	asm("swi #0");
 
 	const char* our_string = "testing";
 	pprintf("this string: %s\n", our_string);

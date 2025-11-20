@@ -1,4 +1,6 @@
-#define STACK_SIZE 8192
+#include <debug_utils.h>
+
+#define STACK_SIZE 8192*4
 #define STACK_START 0x00300000-(STACK_SIZE*8)
 
 #define USR_BIT 0b10000
@@ -10,11 +12,15 @@
 #define SYS_BIT 0b11111
 
 
+void _init_stack(unsigned int mode, unsigned int address); 
+
+
 
 void singular_stack_set(unsigned int mode,void * address)
 {
 	//r0 -> mode
 	//r1 -> address
+
 
 	asm volatile(
 		"mrs r2, cpsr\n"
@@ -34,10 +40,12 @@ void init_stack(void)
 	
 	int modes[] ={FIQ_BIT, IRQ_BIT, SVC_BIT, ABT_BIT,UND_BIT,SYS_BIT};
 	unsigned int i;
-	for(i=0; i<=(sizeof(modes)/sizeof(int)); i++){
-		singular_stack_set(modes[i], (void *)STACK_START +i*STACK_SIZE);
+	for(i=0; i<6; i++){
+		_init_stack(modes[i],(unsigned int) STACK_START +i*STACK_SIZE);
+		pprintf("stack set for mode %p\n", modes[i]);
 	}
-
+	pprintf("end of stack init");
+	return;
 }
 
 
