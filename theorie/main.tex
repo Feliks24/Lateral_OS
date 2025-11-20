@@ -82,12 +82,16 @@ Der TCB eines Kernel-Threads wird im Kernel-Adressraum gespeichert, typischerwei
 \item Wir haben leider nicht geschafft den Code rechtzeitig zum Laufen zu bringen
 \item Es war einfach zu wenig Hilfestellung und kein guter Weg zu testen das es läuft
 \item Gdb schien uns auch nicht helfen zu wollen
-\tem[]
-\item Memory remap schien noch ganz ok zu gehen
-\item Interrupt Vektor Table zu schreiben und Stack zu initieren haben wir die Idee von verstanden aber selbst der Grundlegende Code hat nicht geklappt ohne das wir überhaupt wissen was passiert
-\item Hat es dann ultimativ sehr frustrierend gemacht weil man keine Ahnung hat was schief läuft oder was gemacht werden soll
+\item Wobei später gdb wieder ging aber nicht ausgereicht hat um Sachen ausreichend zu fixen
 \item[]
-\item Der Code kompeliert und scheint durchzulaufen so das es an ein Print statement kommt aber es kommt nicht dazu, dass der Interrupt bemerkt wird
+\item Memory remap schien noch ganz ok zu gehen
+\item Interrupt Vektor Table und Stack initieren war etwas schwierig, wo
+	ultimativ die Base Funktion nicht funktioniert hat und somit wir die
+	erweiterte Funktionalität nicht geschaft haben
+\item[]
+\item Code kompeliert
+\item Zuvor ging der test print durch nach dem init stack aber es hat keine interrupts behandelt
+\item Jetzt hat es Probleme nach dem stack init und hört danach auf
 \end{itemize}
 
 
