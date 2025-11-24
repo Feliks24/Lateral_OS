@@ -5,12 +5,15 @@
 
 #include "remap_utils.h"
 
+// is after remaping SRAM
 #define IVT_START 0x00000000
 
 extern char _interrupt_table[];
 extern char _interrupt_table_end[];
 
-enum Expection
+// Exception typs
+/*
+typedef enum
 {
 	RESET,
 	UNDEFINED,
@@ -19,7 +22,17 @@ enum Expection
 	DATA_ABORT,
 	IRQ,
 	FIQ
-};
+} Expection;
+ */
+
+static const char *exception_names[] = {
+	"RESET",
+	"UNDEFINED",
+	"SOFTWARE_INTERRUPT",
+	"PREFETCH_ABORT",
+	"DATA_ABORT",
+	"IRQ",
+	"FIQ"};
 
 void set_ivt(void)
 {
@@ -52,19 +65,10 @@ void _stop_process(void)
 	}
 }
 
-static const char *exception_names[] = {
-	"RESET",
-	"UNDEFINED",
-	"SOFTWARE_INTERRUPT",
-	"PREFETCH_ABORT",
-	"DATA_ABORT",
-	"IRQ",
-	"FIQ"};
-
-void _general_exception(Expection ex)
+void _general_exception(int ex_i)
 {
 	lprintf("----------------------------------------");
-	lprintf("detected an exception: %s", exception_names[ex]);
+	lprintf("detected an exception: %s", exception_names[ex_i]);
 	lprintf("----------------------------------------");
 
 	switch (ex)
@@ -90,5 +94,5 @@ void _general_exception(Expection ex)
 			break;
 		}
 	}
-	lprintf("OS stoped ")
+	lprintf("OS stoped ");
 }

@@ -21,25 +21,25 @@ _interrupt_table:
  	ldr	pc,trampoline_fiq	
 
 trampoline_reset:
-    mov r0, #RESET
+    mov r0, #0
     b _general_exception
 trampoline_undef:
-    mov r0, #UNDEFINED
+    mov r0, #1
     b _general_exception
 trampoline_swi:
-    mov r0, #SOFTWARE_INTERUPT
+    mov r0, #2
     b _general_exception
 trampoline_prefetch:
-    mov r0, #PREFETCH_ABORT
+    mov r0, #3
     b _general_exception
 trampoline_data:
-    mov r0, #DATA_ABORT
+    mov r0, #4
     b _general_exception
 trampoline_irq:	
-    mov r0, #IRQ
+    mov r0, #5
     b _general_exception
 trampoline_fiq:
-    mov r0, #FIQ
+    mov r0, #6
     b _general_exception
 
 .global _interrupt_table_end

@@ -1,6 +1,6 @@
 #include <debug_utils.h>
 
-#define STACK_SIZE 8192*4
+#define STACK_SIZE (8192*4)
 #define STACK_START 0x00300000-(STACK_SIZE*8)
 
 #define USR_BIT 0b10000
@@ -38,9 +38,9 @@ void singular_stack_set(unsigned int mode,void * address)
 void init_stack(void)
 {
 	
-	int modes[] ={FIQ_BIT, IRQ_BIT, SVC_BIT, ABT_BIT,UND_BIT,SYS_BIT};
+	int modes[] ={FIQ_BIT, IRQ_BIT, SVC_BIT, ABT_BIT,UND_BIT,SYS_BIT, USR_BIT};
 	unsigned int i;
-	for(i=0; i<6; i++){
+	for(i=0; i<7; i++){
 		_init_stack(modes[i],(unsigned int) STACK_START +i*STACK_SIZE);
 		lprintf("stack set for mode %p\n", modes[i]);
 	}
