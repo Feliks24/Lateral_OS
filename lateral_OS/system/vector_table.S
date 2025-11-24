@@ -22,25 +22,25 @@ _interrupt_table:
 
 trampoline_reset:
     mov r0, #0
-    b _general_exception
+    b _handel_exceptions
 trampoline_undef:
     mov r0, #1
-    b _general_exception
+    b _handel_exceptions
 trampoline_swi:
     mov r0, #2
-    b _general_exception
+    b _handel_exceptions
 trampoline_prefetch:
     mov r0, #3
-    b _general_exception
+    b _handel_exceptions
 trampoline_data:
     mov r0, #4
-    b _general_exception
+    b _handel_exceptions
 trampoline_irq:	
     mov r0, #5
-    b _general_exception
+    b _handel_exceptions
 trampoline_fiq:
     mov r0, #6
-    b _general_exception
+    b _handel_exceptions
 
 .global _interrupt_table_end
 _interrupt_table_end:

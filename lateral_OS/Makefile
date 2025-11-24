@@ -16,8 +16,8 @@
 # Quellen
 #
 LSCRIPT = kernel.lds
-OBJ = start.o utils/lprint.o driver/remap_utils.o system/set_ivt.o
-OBJ += system/vector_table.o system/init_stack.o system/asm_stack.o
+OBJ = start.o utils/debug_utils.o driver/remap_utils.o system/set_ivt.o
+OBJ += system/vector_table.o system/init_stack.o system/asm_stack.o cosmetic/boot_titel.o
 
 #
 # Konfiguration

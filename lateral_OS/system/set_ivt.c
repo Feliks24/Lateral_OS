@@ -1,9 +1,9 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <debug_utils.h>
 
-#include "remap_utils.h"
+#include "utils.h"
+#include "system.h"
 
 // is after remaping SRAM
 #define IVT_START 0x00000000
@@ -12,18 +12,17 @@ extern char _interrupt_table[];
 extern char _interrupt_table_end[];
 
 // Exception typs
-/*
 typedef enum
 {
-	RESET,
-	UNDEFINED,
-	SOFTWARE_INTERUPT,
-	PREFETCH_ABORT,
-	DATA_ABORT,
-	IRQ,
-	FIQ
-} Expection;
- */
+	RESET = 0,
+	UNDEFINED = 1,
+	SOFTWARE_INTERRUPT = 2,
+	PREFETCH_ABORT = 3,
+	DATA_ABORT = 4,
+	IRQ = 5,
+	FIQ = 6,
+	EXCEPTION_COUNT
+} Exception;
 
 static const char *exception_names[] = {
 	"RESET",
@@ -65,13 +64,15 @@ void _stop_process(void)
 	}
 }
 
-void _general_exception(int ex_i)
+void _handel_exceptions(int ex_i)
 {
+	const char *ex_name = exception_names[ex_i];
+
 	lprintf("----------------------------------------");
-	lprintf("detected an exception: %s", exception_names[ex_i]);
+	lprintf("detected an exception: %s (%d)", ex_name, ex_i);
 	lprintf("----------------------------------------");
 
-	switch (ex)
+		switch (ex_i)
 	{
 	// will stop ongoing process
 	case RESET:
