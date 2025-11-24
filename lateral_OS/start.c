@@ -4,10 +4,15 @@
 
 __attribute__((naked, section(".init"))) void _start(void)
 {
+	// cosmetic
 	_print_titel();
 
+	// -----------------------------------------------------------
+
+	// main functionality
+
 	// step 1: remap memory
-	memory_remap();
+	//memory_remap();
 
 	// step 2: IVT
 	set_ivt();
