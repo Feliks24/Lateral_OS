@@ -42,9 +42,9 @@ void init_stack(void)
 	unsigned int i;
 	for(i=0; i<6; i++){
 		_init_stack(modes[i],(unsigned int) STACK_START +i*STACK_SIZE);
-		pprintf("stack set for mode %p\n", modes[i]);
+		lprintf("stack set for mode %p\n", modes[i]);
 	}
-	pprintf("end of stack init");
+	lprintf("end of stack init");
 	return;
 }
 

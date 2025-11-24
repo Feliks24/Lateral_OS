@@ -6,6 +6,6 @@ char char_get(void);
 
 void _sleep(void);
 
-int pprintf(char *fmt, ...);
+int lprintf(char *fmt, ...);
 
 #endif
