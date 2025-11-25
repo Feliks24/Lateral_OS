@@ -1,7 +1,7 @@
 #include "utils.h"
 
 #define STACK_SIZE (8192 * 4)
-#define STACK_START 0x00300000 - (STACK_SIZE * 8)
+#define STACK_START 0x00300000
 
 #define USR_BIT 0b10000
 #define FIQ_BIT 0b10001
@@ -25,23 +25,24 @@ void singular_stack_set(unsigned int mode, void *address)
 		"msr cpsr_c, r3\n"
 		"mov sp, %1\n"
 		"msr cpsr_c, r2\n"
-		"mov pc, lr\n" ::"r"(mode),
-		"r"(address));
+		:
+		: "r"(mode), "r"(address)
+		: "r2", "r3");
 }
 
 void init_stack(void)
 {
 	// ! USR funktioniert nicht
-	int modes[] = {FIQ_BIT, IRQ_BIT, SVC_BIT, ABT_BIT, UND_BIT, SYS_BIT, USR_BIT};
-	char *mode_names[] = {"FIQ", "IRQ", "SVC", "ABT", "UND", "USR"};
+	int modes[] = {FIQ_BIT, IRQ_BIT, ABT_BIT, UND_BIT, SYS_BIT};
+	char *mode_names[] = {"FIQ", "IRQ", "ABT", "UND", "SYS"};
 
 	unsigned int i;
-	for (i = 0; i < 6; i++)
+	for (i = 0; i < 5; i++)
 	{
 		unsigned int addr = STACK_START - i * STACK_SIZE;
 		_init_stack(modes[i], addr);
 		lprintf("stack set for mode %s : %x : %x \n", mode_names[i], modes[i], addr);
 	}
-	lprintf("end of stack init");
+	lprintf("end of stack init \n");
 	return;
 }
