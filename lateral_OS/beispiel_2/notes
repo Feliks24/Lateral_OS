@@ -1,0 +1,31 @@
+LIB
+there's a memcopy implementation in lib/mem.c
+copies from one adress to other of some size n
+HEADERS
+in header files include/system.h defines some PSR control bits
+as well as the psr modes/modus bits??
+DRIVER
+mc_remap
+in memory driver there is mc_get_abort_adress which writes from MC to some AASR
+which is the 3rd component in the MC 
+16.3.4
+
+START
+init_other_stacks();
+init_exception();
+Software interrupt
+	with asm("swi #0")
+Data Abort
+	*(int *)0xa00000000=0; //Chapter 8 in AT91RM9200
+Undefined Instruction
+	asm(".word 0x07F000F0") //A3.16.5 im ARM architecture RM
+SYSTEM
+ASSEMBLER
+
+cpu_asm.S
+	implements _set_stack, get banked sp lr, get_cpsr/spsr, calc_store_pc_offset
+exception_asm.S
+	implements the trampoline _exception_vectors_begin
+system/memlayout.h defines stack bottom as 0x24000000 adn stack size as 1024*64
+
+info is just printing the registers
