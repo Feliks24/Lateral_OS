@@ -28,9 +28,10 @@ OBJ += lib/print.o lib/mem.o
 #
 # Konfiguration
 #
-CC = arm-none-eabi-gcc
-LD = arm-none-eabi-ld
-OBJCOPY = arm-none-eabi-objcopy
+
+CC = /home/mi/linnert/arm/bin/arm-none-eabi-gcc
+LD = /home/mi/linnert/arm/bin/arm-none-eabi-ld
+OBJCOPY = /home/mi/linnert/arm/bin/arm-none-eabi-objcopy
 
 CFLAGS = -Wall -Wextra -ffreestanding -mcpu=arm920t -O2
 CPPFLAGS = -Iinclude
