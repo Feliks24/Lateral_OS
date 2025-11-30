@@ -72,8 +72,40 @@ void int_to_hex(unsigned int num)
 	}
 }
 
-__attribute__((format(printf, 1, 2))) 
-int lprintf(char *fmt, ...)
+void arg_to_int(int num)
+{
+	//max 10 digits + (-)
+	char buffer[11];
+	int i = 0;
+	unsigned int u;
+
+	if (num == 0)
+	{
+		char_put('0');
+		return;
+	}
+	else if (num < 0)
+	{
+		char_put('-');
+		u = (unsigned int)(-num);
+	}
+	else
+	{
+		u = (unsigned int)num;
+	}
+	while (u > 0)
+	{
+		// get last digit (%10) and convert to char
+		// + 48 --> ascii '0'
+		buffer[i++] = '0' + (u % 10);
+		u /= 10;
+	}
+
+	while (i--)
+		char_put(buffer[i]);
+}
+
+__attribute__((format(printf, 1, 2))) int lprintf(char *fmt, ...)
 {
 
 	// va_list && va_start && va_end --> brauchen hier eigene Speicheradressen
@@ -124,6 +156,11 @@ int lprintf(char *fmt, ...)
 			case 'x':
 				// unsinged int to hexadecimal
 				int_to_hex(va_arg(args, unsigned int));
+				break;
+
+			case 'd':
+				// unsinged int
+				arg_to_int(va_arg(args, unsigned int));
 				break;
 			case 'p':
 				// assuming both unsigned int and void * have 4bytes
