@@ -9,10 +9,11 @@
  */
 void start_kernel(void)
 {
+
+	print_title();
  	/*
  	 * System initialisieren.
  	 */
-	_print_title(void);
   	init_other_stacks(); 
   	init_exceptions();
  
@@ -20,6 +21,8 @@ void start_kernel(void)
  	 * Test-Programm vorübergehend hier, bis es durch etwas richtiges
  	 * ersetzt wird. :)
  	 */
+
+
  	printf("Test der Ausnahmebehandlung:\n"
  	       "Welche Ausnahme soll ausgeloest werden?\n"
  	       "1) Software Interrupt\n"

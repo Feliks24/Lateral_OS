@@ -44,7 +44,5 @@ enum psr get_cpsr(void);
 enum psr get_spsr(void);
 int calc_store_pc_offset(void); 
  
-//cosmetics
-void _print_titel(void);
 
 #endif /* _SYSTEM_H_ */
