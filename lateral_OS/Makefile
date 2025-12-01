@@ -16,19 +16,25 @@
 # Quellen
 #
 LSCRIPT = kernel.lds
-OBJ = start.o utils/debug_utils.o driver/remap_utils.o system/set_ivt.o
-OBJ += system/vector_table.o system/init_stack.o system/asm_stack.o cosmetic/boot_titel.o
+
+OBJ =  system/entry.o system/start.o
+OBJ += system/exceptions.o system/exceptions_asm.o
+OBJ += system/cpu.o system/cpu_asm.o
+OBJ += system/info.o 
+OBJ += lib/boot_title.o
+OBJ += driver/dbgu.o driver/mc.o
+OBJ += lib/print.o lib/mem.o
 
 #
 # Konfiguration
 #
+
 CC = /home/mi/linnert/arm/bin/arm-none-eabi-gcc
 LD = /home/mi/linnert/arm/bin/arm-none-eabi-ld
 OBJCOPY = /home/mi/linnert/arm/bin/arm-none-eabi-objcopy
 
 CFLAGS = -Wall -Wextra -ffreestanding -mcpu=arm920t -O2
-CFLAGS += -Iheaders/
-CFLAGS += -g
+CPPFLAGS = -Iinclude
 #LIBGCC := $(shell $(CC) -print-libgcc-file-name)
 
 DEP = $(OBJ:.o=.d)
@@ -42,10 +48,10 @@ all: kernel
 -include $(DEP)
 
 %.o: %.S
-	$(CC) $(CFLAGS) -MMD -MP -o $@ -c $<
+	$(CC) $(CPPFLAGS) $(CFLAGS) -MMD -MP -o $@ -c $<
 
 %.o: %.c
-	$(CC) $(CFLAGS) -MMD -MP -o $@ -c $<
+	$(CC) $(CPPFLAGS) $(CFLAGS) -MMD -MP -o $@ -c $<
 
 kernel: $(LSCRIPT) $(OBJ)
 	$(LD) -T$(LSCRIPT) -o $@ $(OBJ) $(LIBGCC)
@@ -62,6 +68,6 @@ install: kernel.img
 
 .PHONY: clean
 clean:
-	rm -f kernel.bin kernel.img
+	rm -f kernel kernel.bin kernel.img
 	rm -f $(OBJ)
 	rm -f $(DEP)

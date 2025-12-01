@@ -1,1 +1,0 @@
-void _print_titel(void);

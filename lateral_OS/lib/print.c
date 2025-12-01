@@ -105,7 +105,7 @@ void arg_to_int(int num)
 		char_put(buffer[i]);
 }
 
-__attribute__((format(printf, 1, 2))) int lprintf(char *fmt, ...)
+__attribute__((format(printf, 1, 2))) int printf(char *fmt, ...)
 {
 
 	// va_list && va_start && va_end --> brauchen hier eigene Speicheradressen
