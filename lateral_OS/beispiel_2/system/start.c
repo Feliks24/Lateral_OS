@@ -12,6 +12,7 @@ void start_kernel(void)
  	/*
  	 * System initialisieren.
  	 */
+	_print_title(void);
   	init_other_stacks(); 
   	init_exceptions();
  

@@ -6,6 +6,10 @@ char char_get(void);
 
 void _sleep(void);
 
-int lprintf(char *fmt, ...);
+__attribute__ ((format(printf,1,2)))
+int printf(char *fmt, ...);
+
+
+void *memcpy(void *dest, void *src, size_t n); 
 
 #endif
