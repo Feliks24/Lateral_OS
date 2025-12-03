@@ -23,51 +23,21 @@ void start_kernel(void)
  	 */
 
 
-	set_timer(0x9FFF);
+	//set_timer(0xFFFF);
+
+	
+
 	while(1){
-		//if (((*(volatile unsigned int *)(0xFFFFFD00+0x0010))& 0x1) == 1){
-			//printf("interrupt detected\n");
-		//}
-		check_interrupt();
+		char c = char_get();
+		int i;
+		for(i=0;i<10;i++){
+			_sleep();
+			printf("%c",c);
+		}
+
+		set_timer(0xFFFF);
+		
 	}
 
- 	printf("Test der Ausnahmebehandlung:\n"
- 	       "Welche Ausnahme soll ausgeloest werden?\n"
- 	       "1) Software Interrupt\n"
- 	       "2) Data Abort\n"
- 	       "3) Undefined Instruction\n"
- 	       "> ");
- 
- 	while (1) {
- 		char c = dbgu_getc(); 
- 
- 		switch(c) { 
- 		case '1':
- 			/*
- 			 * Software Interrupt (siehe Kap. A4.1.107 im ARM
- 			 * Architecture Reference Manual)
- 			 */
-  			asm ("swi #0");
-  			break; 
- 		case '2':
- 			/* Data Abort (siehe Kap. 8 im AT91RM9200 Handbuch) */ 
- 			*(int *)0xa0000000 = 0;
-  			break; 
- 		case '3':
- 			/*
- 			 * Undefined Instruction (aus dem "Architecturally
- 			 * Undefined Instruction space", siehe Kap. A3.16.5 im
- 			 * ARM Architecture Reference Manual)
- 			 */
-  			asm (".word 0x07F000F0"); 
-  			break; 
- 		default:
-  			continue;
- 		}
- 
- 		printf("\n"
- 		       "Unerwartete Rückkehr?! (Data Abort geht unter QEMU nicht.)\n"
- 		       "Was darf es jetzt sein?\n"
- 		       "> ");
- 	}
+ 	
 }
