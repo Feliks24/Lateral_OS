@@ -23,6 +23,14 @@ void start_kernel(void)
  	 */
 
 
+	set_timer(0x9FFF);
+	while(1){
+		//if (((*(volatile unsigned int *)(0xFFFFFD00+0x0010))& 0x1) == 1){
+			//printf("interrupt detected\n");
+		//}
+		check_interrupt();
+	}
+
  	printf("Test der Ausnahmebehandlung:\n"
  	       "Welche Ausnahme soll ausgeloest werden?\n"
  	       "1) Software Interrupt\n"

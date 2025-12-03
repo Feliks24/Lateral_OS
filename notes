@@ -2,6 +2,7 @@ ARM blau(701)
 
 24.1 Overview System Timer
 
+----this seems not to be important
 23.6.7
 Register CKGR_MOR page 267
 	PMC base address 0xFFFFFC00
@@ -14,8 +15,27 @@ Register CKGR_MOR page 267
 	check PMC_SR the MOSCS bit to check whether it's stablized
 	PMC_SR 0x0068
 	MOSCS check for 1 at 0
+-------
 
 setting the period interval timer
 page 293 and 294
 page 297 register of ST_PIMR
 	
+24.5.2 Period Inerval Timer(PIT)
+	System timer base address
+		0xFFFF FD00
+	set ST_PIMR - period interval mode register
+	0x0004
+	set PITS bit in ST_IER
+		ST_IER 0x0014
+	1<<0
+
+	enable interrupt by writing PITS bit in ST_IER
+ 	set frequency PIV (16 bits) in ST_PIMR
+
+ 	255 cycles is roughly 60ms(62 per manual)
+ 	max PIV can be programmed to 65536 as per manual into PIV
+ 	as 65536 = 2^16
+ 	so 65536 = 256*32
+ 	therefore max timer is 62ms*32=1984
+ 	therefore max frequency is roughly 2 seconds

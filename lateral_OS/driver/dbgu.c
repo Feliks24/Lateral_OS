@@ -5,13 +5,23 @@
  
 /* Adresse der Debug-Schnittstelle (Abb. 8-1) */ 
 #define DBGU_BASE 0xFFFFF200
+//#define DBGU_IE_OFFSET 0x0008
+//#define DBGU_IE_ADDR (DBGU_BASE+DBGU_IE_OFFSET)
+//#define DBGU_IE (*(volatile unsigned int *)DBGU_IE_ADDR)
+
+
+
  
 /* genutzte Register der Debug-Unit (Tab. 26-2) */ 
 struct dbgu { 
- 	unsigned int unused[5]; 
- 	unsigned int sr;
- 	unsigned int rhr;
- 	unsigned int thr;
+	volatile unsigned int cr;
+    	volatile unsigned int mr;
+    	volatile unsigned int ier;
+    	volatile unsigned int idr;
+    	volatile unsigned int imr;
+    	volatile unsigned int sr;
+    	volatile unsigned int rhr;
+    	volatile unsigned int thr;
 };
  
 /* genutzte Bits des Statusregisters (Kap. 26.5.6) */ 
@@ -34,4 +44,11 @@ char dbgu_getc(void)
 {
   	do {} while (!(dbgu->sr & RXRDY)); 
  	return dbgu->rhr; 
+}
+
+void dbgu_enable_interrupt(void)
+{
+	//volatile unsigned int write_val = dbgu->ier | (RXRDY | TXRDY);
+	dbgu->ier = 0b11;
+
 }

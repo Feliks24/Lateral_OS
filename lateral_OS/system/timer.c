@@ -1,57 +1,72 @@
 
 /*
- all sources will be realted to manual 701
+ enable interrupt by writing PITS bit in ST_SR
+ set frequency PIV (16 bits) in ST_PIMR
 
- general info about clocks page 267
- CKGR_MOR register page 283
- PMC_SR register page 291
- CKGR_MOR and PMC_SR are both in PMC
- 
- write MOSCEN into CKGR_MOR to activate oscillator
- set OSCOUNTER for countdown 
- check MOSCS in PMC_SR where 1 -> stable
-
+ 255 cycles is roughly 60ms(62 per manual)
+ max PIV can be programmed to 65536 as per manual into PIV
+ as 65536 = 2^16
+ so 65536 = 256*32
+ therefore max timer is 62ms*32=1984
+ therefore max frequency is roughly 2 seconds
 
 */
-#define PMC_BASE 0xFFFFFC00
-#define CKGR_MOR 0x0020
-#define PMC_SR 0x0068
+#include <stdint.h>
+#include <lib.h>
+#include <dbgu.h>
 
-//write
-#define MOSCEN (1<<0)
+#define ST_BASE 0xFFFFFD00
 
-//read
-#define MOSCS (1<<0)
+#define ST_SR 0x0010
+#define ST_IER 0x0014
+#define ST_PIMR 0x0004
 
-//127 x 8 cycles which should be about 31ms
-//as 255 is 62ms as said in manual
-#define OSCOUNT 8
-#define OSCOUNT_VALUE 0b01111111
-#define OSCOUNT_MASK 0xFF00
+#define PITS 0
+#define PIV 0
 
+#define AIC_BASE 0xFFFFF00
 
+#define AIC_IECR_OFFSET 0x120
+#define IECR_ENABLE_MASK 0x4
 
-void activate_OSC(void){
-	//set OSCOUNT
-	//get values
-	
-	volatile unsigned int *ckgr_mor_register = (volatile unsigned int *)(PMC_BASE+CKGR_MOR);
-	//extract first 8 bits
-	unsigned int masked_value = *ckgr_mor_register & (~OSCOUNT_MASK);
-	//combined first 8 bits with what we want to write into OSCOUNT
-	unsigned int final_value = masked_value | (OSCOUNT_VALUE<<OSCOUNT);
-	//also set MOSCEN bit
-	final_value = final_value | MOSCEN;
-	//write
-	*ckgr_mor_register = final_value;
+void _cpsr_interrupt_enable(void);
 
-	while(!(*(volatile unsigned int *)(PMC_BASE+PMC_SR) & MOSCS)){};
-	
+void set_timer_interrupt(uint16_t frequency){
+	//set timer
+	*(volatile unsigned int *)(ST_BASE+ST_PIMR) = (frequency);
+	//enable interrupt
+	*(volatile unsigned int *)(ST_BASE+ST_IER) = (1<<PITS);
+
+}
+
+void set_aic_interrupt(void){
+	*(volatile unsigned int *)(AIC_BASE+AIC_IECR_OFFSET)= IECR_ENABLE_MASK;
+}
+
+void check_interrupt(void){
+	//test function to check for interrupts without actually handling
+	uint16_t st_sr_bits = *(volatile unsigned int *)(ST_BASE+ST_SR);
+	if(st_sr_bits & 1<<0){
+		printf("PITS detected\n");
+	}
+	if(st_sr_bits & 1<<1){
+		printf("WDOVF detected\n");
+	}
+	if(st_sr_bits & 1<<2){
+		printf("RTTINC detected\n");
+	}
+	if(st_sr_bits & 1<<3){
+		printf("ALMS detected\n");
+	}
 }
 
 
-void set_timer(unsigned int frequency){
-	(void) frequency;
-	activate_OSC();
 
+
+
+void set_timer(unsigned int frequency){
+
+	set_timer_interrupt((uint16_t)frequency);
+	dbgu_enable_interrupt();
+	set_aic_interrupt();
 }
