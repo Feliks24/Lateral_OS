@@ -17,16 +17,14 @@ void start_kernel(void)
   	init_other_stacks(); 
   	init_exceptions();
  
- 	/*
- 	 * Test-Programm vorübergehend hier, bis es durch etwas richtiges
- 	 * ersetzt wird. :)
- 	 */
+ 	
 
 
-	//set_timer(0xFFFF);
+	set_timer(0xFFFF);
 
 	
 
+	//Test program
 	while(1){
 		char c = char_get();
 		int i;
@@ -34,8 +32,6 @@ void start_kernel(void)
 			_sleep();
 			printf("%c",c);
 		}
-
-		set_timer(0xFFFF);
 		
 	}
 
