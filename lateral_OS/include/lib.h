@@ -13,6 +13,7 @@ void printf(char *format, ...);
 
 /* lib/boot_print.c */
 void print_title(void);
+void _sleep(void);
 
 
  

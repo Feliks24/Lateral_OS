@@ -44,5 +44,7 @@ enum psr get_cpsr(void);
 enum psr get_spsr(void);
 int calc_store_pc_offset(void); 
  
+void set_timer(unsigned int frequency);
+void check_interrupt();
 
 #endif /* _SYSTEM_H_ */
