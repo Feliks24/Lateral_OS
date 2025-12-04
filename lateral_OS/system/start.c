@@ -17,8 +17,6 @@ void start_kernel(void)
   	init_other_stacks(); 
   	init_exceptions();
  
- 	
-
 
 	set_timer(0xFFFF);
 

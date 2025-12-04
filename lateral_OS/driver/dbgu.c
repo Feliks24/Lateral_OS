@@ -5,10 +5,6 @@
  
 /* Adresse der Debug-Schnittstelle (Abb. 8-1) */ 
 #define DBGU_BASE 0xFFFFF200
-//#define DBGU_IE_OFFSET 0x0008
-//#define DBGU_IE_ADDR (DBGU_BASE+DBGU_IE_OFFSET)
-//#define DBGU_IE (*(volatile unsigned int *)DBGU_IE_ADDR)
-
 
 
  
