@@ -24,8 +24,7 @@ OBJ += system/info.o
 OBJ += lib/boot_title.o
 OBJ += driver/dbgu.o driver/mc.o
 OBJ += lib/print.o lib/mem.o
-OBJ += system/timer.o
-
+OBJ += system/timer.o system/asm_timer.o driver/aic.o
 #
 # Konfiguration
 #

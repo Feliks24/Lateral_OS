@@ -3,6 +3,8 @@
  
 void dbgu_putc(char chr); 
 char dbgu_getc(void); 
-void dbgu_enable_interrupt(void);
+void dbgu_init(void);
+void dbgu_irq_handler(void);
+
  
 #endif /* _DBGU_H_ */

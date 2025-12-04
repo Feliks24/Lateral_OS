@@ -26,13 +26,14 @@ _exception_vectors_begin:
  	ldr	pc, jt_prefabort	/* Prefetch Abort */ 
  	ldr	pc, jt_dataabort	/* Data Abort */ 
  	ldr	pc, jt_unhandled	/* Reserved */ 
- 	ldr	pc, jt_unhandled	/* Interrupt */ 
+ 	ldr	pc, jt_irq	/* Interrupt */ 
  	ldr	pc, jt_unhandled	/* Fast Interrupt */ 
  
-jt_undef:	.word undef_trampoline
-jt_swi:		.word swi_trampoline
+jt_undef:	    .word undef_trampoline
+jt_swi:		    .word swi_trampoline
 jt_prefabort:	.word prefabort_trampoline
 jt_dataabort:	.word dataabort_trampoline
+jt_irq:     	.word irq_trampoline
 jt_unhandled:	.word unhandled_trampoline
  
 .global _exception_vectors_end
@@ -85,6 +86,25 @@ dataabort_trampoline:
  	/* C-Handler (ohne Wiederkehr) aufrufen mit Zeiger auf Registersatz */ 
   	mov	r0, sp
  	b	_exception_dataabort
+
+irq_trampoline:
+    sub lr, lr, #4              
+    stmfd sp!, {r0-r3, r12, lr}
+    
+    /*  AIC_IVR lesen */
+    ldr r0, =0xFFFFF100         
+    ldr r1, [r0]                
+    
+    /*  C-Handler aufrufen */
+    mov lr, pc                  
+    mov pc, r1                  
+    
+    /*  AIC_EOICR schreiben */
+    ldr r0, =0xFFFFF130         
+    mov r1, #0                  
+    str r1, [r0]                
+    
+    ldmfd sp!, {r0-r3, r12, pc}^
  
 unhandled_trampoline:
  	/* Debug-Registersatz sichern */ 

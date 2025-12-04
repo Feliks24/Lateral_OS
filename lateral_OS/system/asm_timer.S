@@ -1,6 +1,6 @@
 
-.global _cpsr_enable_interrupt
-_cpsr_enable_interrupt:
+.global _cpsr_interrupt_enable
+_cpsr_interrupt_enable:
 	
 	//get cpsr
 	MRS r0, CPSR
@@ -12,3 +12,6 @@ _cpsr_enable_interrupt:
 	//write back
 	//with _c bit set, only write control fields
 	MSR CPSR_c, r0	
+
+    //return
+    mov pc, lr   

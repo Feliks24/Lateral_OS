@@ -16,7 +16,7 @@ static inline void write_u32(unsigned int addr, unsigned int val)
 void _sleep()
 {
 	volatile long i;
-	for (i = 0; i < 100000000; i++)
+	for (i = 0; i < 10000000; i++)
 		;
 }
 
@@ -73,7 +73,7 @@ void int_to_hex(unsigned int num)
 
 void arg_to_int(int num)
 {
-	//max 10 digits + (-)
+	// max 10 digits + (-)
 	char buffer[11];
 	int i = 0;
 	unsigned int u;

@@ -1,43 +1,33 @@
 #include <system.h>
 #include <lib.h>
 #include <dbgu.h>
- 
-/*
- * start_kernel() - unser C-Eintrittspunkt
- *
- * Wird direkt nach Initialisierung des Supervisor-Stacks gestartet.
- */
+
 void start_kernel(void)
 {
-
 	print_title();
- 	/*
- 	 * System initialisieren.
- 	 */
-  	init_other_stacks(); 
-  	init_exceptions();
- 
- 	/*
- 	 * Test-Programm vorübergehend hier, bis es durch etwas richtiges
- 	 * ersetzt wird. :)
- 	 */
+	/*
+	 * System initialisieren.
+	 */
+	init_other_stacks();
+	init_exceptions();
+	dbgu_init();
 
+	// !! HIER TIMER FREQUENZ EINSTELLEN !!
+	set_timer(32768);
 
-	//set_timer(0xFFFF);
+	printf("System bereit! Druecke Tasten!\n");
+	printf("Timer-Interrupts: ! (alle 1 s)\n");
+	printf("Tastendruck: Zeichen wird 20x ausgegeben\n\n");
 
-	
+	while (1)
+	{
+		char c = dbgu_getc();
 
-	while(1){
-		char c = char_get();
 		int i;
-		for(i=0;i<10;i++){
+		for (i = 0; i < 20; i++)
+		{
+			dbgu_putc(c);
 			_sleep();
-			printf("%c",c);
 		}
-
-		set_timer(0xFFFF);
-		
 	}
-
- 	
 }
