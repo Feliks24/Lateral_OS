@@ -6,32 +6,21 @@ by Feliks & Bennet
 
 For task 3 we first of all started with the solution code from task 2
 as our task 2 didn't work. We added some of our code, which is mainly
-print and cosmetic stuff. For actually doing the task we added some
-code in the ´system/timer.c´ file as well as added the
-dbgu_enable_interrupt() function in ´driver/dbgu.c´. As well as the
-test function in ´system/start.c´.
+print and cosmetic stuff. 
 
 What we did:
 
-* init the timer
-* init the dbgu interrupt
-* init AIC
-* init cpsr by masking the I-bit
-* write a test function
-
-Current behaviour:
-
-* it does an interrupt almost instantly
-* not sure if the first interrupt just naturally
-happens like that
-
-What we we're not able to do:
-
-* interrupt handling
-* setting the dbgu into interrupt mode
-* the test function doesn't help since the interrupt
-happens before anything is possible
-
+* Added system timer initialization in `system/timer.c` for periodic 
+  interrupts (configurable at `start.c`)
+* Implemented `dbgu_enable_interrupt()` in `driver/dbgu.c` for 
+  interrupt-driven character reception with a buffer 
+* Created AIC driver in `driver/aic.c` to configure and route interrupts
+* Added `_cpsr_interrupt_enable()` in `system/asm_timer.S` to unmask IRQs
+* Implemented `irq_trampoline` in `system/exceptions_asm.S` following 
+  AIC protocol (read IVR, call handler, write EOICR)
+* Extended `dbgu_init()` to enable receiver/transmitter 
+* Created test application in `system/start.c` that waits for keypresses 
+  and outputs characters, while timer interrupts print "!" every 1s
 
 ## Compiling
 
