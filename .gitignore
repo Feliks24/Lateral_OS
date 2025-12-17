@@ -4,6 +4,7 @@
 *.out
 *.d
 uni
+_notes
 
 # Mac VScode
 *.vscode/*
