@@ -21,8 +21,10 @@ void start_kernel(void)
 	init_exceptions();
 	dbgu_init();
 	set_timer(32768);
-	
-	
+
+
+
+	init_tcbs();
 
 	demo_thread('A', 10);
 	/*

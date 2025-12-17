@@ -26,7 +26,7 @@ _exception_vectors_begin:
  	ldr	pc, jt_prefabort	/* Prefetch Abort */ 
  	ldr	pc, jt_dataabort	/* Data Abort */ 
  	ldr	pc, jt_unhandled	/* Reserved */ 
- 	ldr	pc, jt_irq	/* Interrupt */ 
+ 	ldr	pc, jt_irq		/* Interrupt */ 
  	ldr	pc, jt_unhandled	/* Fast Interrupt */ 
  
 jt_undef:	    .word undef_trampoline
@@ -90,7 +90,12 @@ dataabort_trampoline:
 irq_trampoline:
     sub lr, lr, #4              
     stmfd sp!, {r0-r3, r12, lr}
-    
+	//save to irq_stack!!
+   
+    	//TODO: read out tcb
+	//get the stack pointers 
+	// save all the register to that address
+	//now save onto private stack
     /*  AIC_IVR lesen */
     ldr r0, =0xFFFFF100         
     ldr r1, [r0]                
@@ -98,12 +103,16 @@ irq_trampoline:
     /*  C-Handler aufrufen */
     mov lr, pc                  
     mov pc, r1                  
+	//call reschedule 
     
     /*  AIC_EOICR schreiben */
     ldr r0, =0xFFFFF130         
     mov r1, #0                  
     str r1, [r0]                
     
+	//instead of just restoring, restore 
+	//from now current thread
+	// context switch done
     ldmfd sp!, {r0-r3, r12, pc}^
  
 unhandled_trampoline:

@@ -1,78 +1,111 @@
 #include <lib.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <system.h>
 
-struct tcb{
-	struct tcb *next;
-	/* this should be printed */
-	char character;
-	unsigned int n;
-	unsigned int *priv_SP;
-};
 
-struct dynamic_tcbs{
-	/* we just need to know what is
-	currently running */
-	struct tcb *current;
-	struct tcb *prev;
-	unsigned int num;
-};
 
-struct dynamic_tcbs runqueue;
+void null_thread(){
+	while(1);
+}
+
+void dummy_thread(char character, unsigned int n){
+	while(n>0){
+		_sleep(5);
+		printf("%c", character);
+		n--;
+	}
+}
+
+
 
 void init_tcbs(){
-	runqueue.current = NULL;	
-	runqueue.prev = NULL;
-	runqueue.num = 0;
-	//maybe let a dummy thread run
-}
 
-struct tcb *make_thread(char character, struct tcb *next){
-	/*TODO: do this with malloc*/
-	struct tcb *new_tcb = malloc(sizeof(struct tcb));
-	new_tcb->character = character;
-	new_tcb->next = next;
-	return new_tcb;
-}
-
-void add_thread(char character){
-	
-
-	runqueue.num += 1;
-
-	if(runqueue.num == 1){
-		struct tcb *new_tcb = make_thread(character,  NULL);
-		/*cycle into itself since it's only one*/
-		new_tcb->next = new_tcb;
-
-		runqueue.current = new_tcb;
-		runqueue.prev = new_tcb;
-		return;
-
-	} else {
-		struct tcb *new_tcb = make_thread(character, runqueue.current->next);
-		runqueue.current->next = new_tcb;
-		return;
+	int i;
+	for(i=0; i < THREAD_NUM; i++){
+		all_tcbs[i].thread_id=i; 
+		all_tcbs[i].status = 0;
+		all_tcbs[i].priv_SP = &thread_stacks[i][STACK_SIZE_PRIV];
 	}
+
+	//init first null thread
+	unsigned int *stk = &all_tcbs[0].priv_SP[STACK_SIZE_PRIV-1];
+	
+	//void  *(*foo)(void) = &null_thread;
+	*(--stk) = (unsigned int)&null_thread; 
+
+	//LR stays empty because doesn't return
+    	*(--stk) = (unsigned int)0; 
+
+	//r13 to r0
+	int j;
+    	for(j=0; j < 15; j++){
+        	*(--stk) = 0; 
+	}
+    	
+	//set SPSR with I bit on 0
+    	*(--stk) = 0x10; 
+	running_threads = 1;
+
 }
 
-void pop_thread(){
-	if(runqueue.num == 0){
-		printf("ERROR: removing thread while runqueue empty");
-		return;
-	} 
-
-	runqueue.num -= 1;
-
-	if(runqueue.num == 0){
-		runqueue.prev->next = NULL;
-		runqueue.current = NULL;
-		//TODO: free memory
+void init_thread(char character, unsigned int n){
+	if(running_threads >= THREAD_NUM){
+		printf("ERROR: too many threads");
 		return;
 	}
 	
-	runqueue.prev->next = runqueue.current->next;
-	runqueue.current = runqueue.current->next;
-	// TODO: free memory when change to malloc
+	//first find a place in tcb
+	int i;
+	struct tcb *my_tcb = NULL;
+	for(i=0; i<THREAD_NUM; i++){
+		if(all_tcbs[i].status){
+			continue;
+		}
+		//found empty
+		my_tcb = &all_tcbs[i];
+		break;
+	}
+
+	if(my_tcb == NULL){
+		printf("ERROR: empty tcb not fond");
+		return;
+	}
+	my_tcb->status = 2;
+	
+
+	unsigned int *stk = &my_tcb->priv_SP[STACK_SIZE_PRIV-1];
+	
+	//void  *(*foo)(void) = &null_thread;
+	*(--stk) = (unsigned int)&dummy_thread; 
+
+	//LR stays empty because doesn't return
+    	*(--stk) = (unsigned int)0; 
+
+	//r13 to r2
+	int j;
+    	for(j=0; j < 13; j++){
+        	*(--stk) = 0; 
+	}
+	//second input in r1
+	*(--stk) = (unsigned int) n;
+	//first input in r0
+	*(--stk) = (unsigned int) character;
+	
+    	
+	//set SPSR with I bit on 0
+    	*(--stk) = 0x10;
+}
+
+struct tcb *reschedule(){
+	//for now just always go next
+	int i;
+	for(i=1; i<THREAD_NUM+1; i++){
+		if(all_tcbs[(i+current->thread_id)%THREAD_NUM].status == 2){
+			unsigned int temp = (((unsigned int)i+current->thread_id)%THREAD_NUM);
+			current = &all_tcbs[temp];
+			return current;
+		}
+	}
+	printf("Error finding reading thread in scheduling");
+	return NULL;
 }
 

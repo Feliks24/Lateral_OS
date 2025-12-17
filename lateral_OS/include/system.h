@@ -26,8 +26,9 @@ enum psr_mode {
  	PSR_UND = 0x1b,
  	PSR_SYS = 0x1f,
 };
- 
- 
+
+
+
 /* system/exceptions.c */ 
 void init_exceptions(void); 
  
@@ -47,9 +48,41 @@ int calc_store_pc_offset(void);
 void set_timer(unsigned int frequency);
 void check_interrupt();
 
+
+
+
+
+/*scheduler stuff start*/
+#define THREAD_NUM 16
+#define STACK_SIZE_PRIV 16
+ 
+struct tcb{
+        /* this should be printed */
+        unsigned int *priv_SP;
+        unsigned int thread_id;
+        char character;
+        unsigned int n;
+
+        /*
+                0 -> empty
+                1 -> running
+                2 -> ready
+                3 -> finished
+        */
+        unsigned int status;
+};
+
+
+struct tcb *current;
+unsigned int running_threads;
+unsigned int thread_stacks[THREAD_NUM][STACK_SIZE_PRIV];
+struct tcb all_tcbs[THREAD_NUM];
 void init_tcbs();
-struct tcb make_thread(char character, unsigned int n, struct tcb *next);
-void add_thread(char character, unsigned int n);
-void pop_thread();
+//struct tcb make_thread(char character, unsigned int n, struct tcb *next);
+//void add_thread(char character, unsigned int n);
+//void pop_thread();
+
+
+/* scheduler stuff end*/
 
 #endif /* _SYSTEM_H_ */
