@@ -1,10 +1,13 @@
 #include <lib.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 struct tcb{
 	struct tcb *next;
 	/* this should be printed */
 	char character;
-
+	unsigned int n;
+	unsigned int *priv_SP;
 };
 
 struct dynamic_tcbs{
@@ -24,11 +27,11 @@ void init_tcbs(){
 	//maybe let a dummy thread run
 }
 
-struct tcb make_thread(char character, struct tcb *next){
+struct tcb *make_thread(char character, struct tcb *next){
 	/*TODO: do this with malloc*/
-	struct tcb new_tcb;
-	new_tcb.character = character;
-	new_tcb.next = next;
+	struct tcb *new_tcb = malloc(sizeof(struct tcb));
+	new_tcb->character = character;
+	new_tcb->next = next;
 	return new_tcb;
 }
 
@@ -38,17 +41,17 @@ void add_thread(char character){
 	runqueue.num += 1;
 
 	if(runqueue.num == 1){
-		struct tcb new_tcb = make_thread(character,  NULL);
+		struct tcb *new_tcb = make_thread(character,  NULL);
 		/*cycle into itself since it's only one*/
-		new_tcb.next = &new_tcb;
+		new_tcb->next = new_tcb;
 
-		runqueue.current = &new_tcb;
-		runqueue.prev = &new_tcb;
+		runqueue.current = new_tcb;
+		runqueue.prev = new_tcb;
 		return;
 
 	} else {
-		struct tcb new_tcb = make_thread(character, runqueue.current->next);
-		runqueue.current->next = &new_tcb;
+		struct tcb *new_tcb = make_thread(character, runqueue.current->next);
+		runqueue.current->next = new_tcb;
 		return;
 	}
 }
