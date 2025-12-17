@@ -2,6 +2,15 @@
 #include <lib.h>
 #include <dbgu.h>
 
+
+void demo_thread(char character, unsigned int n){
+	while(n > 0){
+		_sleep(10);
+		printf("%c", character);
+		n -= 1;
+	}
+}
+
 void start_kernel(void)
 {
 	print_title();
@@ -11,10 +20,12 @@ void start_kernel(void)
 	init_other_stacks();
 	init_exceptions();
 	dbgu_init();
-
-	// !! HIER TIMER FREQUENZ EINSTELLEN !!
 	set_timer(32768);
+	
+	
 
+	demo_thread('A', 10);
+	/*
 	printf("System bereit! Druecke Tasten!\n");
 	printf("Timer-Interrupts: ! (alle 1 s)\n");
 	printf("Tastendruck: Zeichen wird 20x ausgegeben\n\n");
@@ -30,4 +41,7 @@ void start_kernel(void)
 			_sleep();
 		}
 	}
+	*/
+	while(1);
 }
+

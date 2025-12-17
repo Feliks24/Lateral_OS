@@ -24,7 +24,7 @@ void init_tcbs(){
 	//maybe let a dummy thread run
 }
 
-struct tcb make_thread(char character, unsigned int n, struct tcb *next){
+struct tcb make_thread(char character, struct tcb *next){
 	/*TODO: do this with malloc*/
 	struct tcb new_tcb;
 	new_tcb.character = character;
@@ -32,12 +32,13 @@ struct tcb make_thread(char character, unsigned int n, struct tcb *next){
 	return new_tcb;
 }
 
-void add_thread(char character, unsigned int n){
+void add_thread(char character){
+	
 
 	runqueue.num += 1;
 
 	if(runqueue.num == 1){
-		struct tcb new_tcb = make_thread(character, n, NULL);
+		struct tcb new_tcb = make_thread(character,  NULL);
 		/*cycle into itself since it's only one*/
 		new_tcb.next = &new_tcb;
 
@@ -46,7 +47,7 @@ void add_thread(char character, unsigned int n){
 		return;
 
 	} else {
-		struct tcb new_tcb = make_thread(character, n, runqueue.current->next);
+		struct tcb new_tcb = make_thread(character, runqueue.current->next);
 		runqueue.current->next = &new_tcb;
 		return;
 	}

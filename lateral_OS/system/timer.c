@@ -16,6 +16,8 @@
 // System Timer Interrupt Enable Register
 #define ST_IER (*(volatile unsigned int *)(ST_BASE + 0x0014))
 
+void _cpsr_interrupt_enable();
+
 void set_timer_interrupt(uint16_t frequency)
 {
     // set timer frequency

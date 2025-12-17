@@ -13,10 +13,10 @@ static inline void write_u32(unsigned int addr, unsigned int val)
 	*(volatile unsigned int *)addr = val;
 }
 
-void _sleep()
+void _sleep(volatile long n)
 {
 	volatile long i;
-	for (i = 0; i < 10000000; i++)
+	for (i = 0; i < (10000000*n); i++)
 		;
 }
 
