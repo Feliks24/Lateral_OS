@@ -47,4 +47,9 @@ int calc_store_pc_offset(void);
 void set_timer(unsigned int frequency);
 void check_interrupt();
 
+void init_tcbs();
+struct tcb make_thread(char character, unsigned int n, struct tcb *next);
+void add_thread(char character, unsigned int n);
+void pop_thread();
+
 #endif /* _SYSTEM_H_ */
