@@ -214,10 +214,22 @@ void dbgu_handle_irq(void)
  	#endif
  
   		extern void test_print_thread(void* x); 
- 		if (start_new_thread(test_print_thread, &c, sizeof(c)))
- 			printf("Limit reached - cannot start new thread\n"); 
- 		else
- 			request_reschedule(); 
+  		extern void test_print_thread_swi(void* x); 
+
+		if((unsigned int)c > 64 && (unsigned int)c < 91){
+			if (start_new_thread(test_print_thread, &c, sizeof(c)))
+ 				printf("Limit reached - cannot start new thread\n"); 
+ 			else
+ 				request_reschedule(); 
+		}
+		else{
+			if (start_new_thread(test_print_thread_swi, &c, sizeof(c)))
+ 				printf("Limit reached - cannot start new thread\n"); 
+ 			else
+ 				request_reschedule(); 
+
+		}
+ 		
  	}
 #endif
 }

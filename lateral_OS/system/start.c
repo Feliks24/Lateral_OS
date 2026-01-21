@@ -22,4 +22,5 @@ void start_kernel(void)
  	st_set_interval(500);
  
  	scheduler_init(); 
+	//asm("swi #1");
 }

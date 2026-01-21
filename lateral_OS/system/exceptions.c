@@ -189,7 +189,41 @@ void _exception_swi(unsigned int regs[16])
  
  	if(mode == PSR_USR) {
  		/* SWI aus User-Modus aus ist gewollt: beende den Thread */ 
-  		end_current_thread(); 
+
+		/* nehme die vorherige operation was ein swi #x  sein sollte */
+		unsigned int *instr_ptr = (unsigned int *)(regs[15] - 4);
+
+    		unsigned int swi_instruction = *instr_ptr;
+
+		/* die letzten 24 bits ist die nummer des swi */
+    		unsigned int swi_number = swi_instruction & 0x00FFFFFF;
+		switch (swi_number)
+		{
+		case 1:
+			/* zeichen ausgeben */
+			printf("swi #1 called");
+			break;
+		case 2:
+			/* zeichen einlesen */
+			printf("swi #2 called");
+		case 3:
+			/* thread beenden */
+			end_current_thread();
+			break;
+		case 4:
+			/* thread erstellen */
+			extern void test_print_thread
+			printf("swi #4 called");
+		case 5:
+			/* thread verzögern */
+			printf("swi #5 called");
+		default:
+			/* wenn der undefined swi called soll er beendet werden*/
+  			end_current_thread(); 
+		}
+
+
+		
  	} else {
  		if (regs[11] == 0xde00)
   			asm ("mov r11, #0; swi 0");
