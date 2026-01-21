@@ -32,6 +32,6 @@ void start_kernel(void)
  
  	scheduler_init(); 
 
-	//start_new_thread(user_program, NULL, sizeof(NULL));
+	start_new_thread(user_program, NULL, sizeof(NULL));
 	
 }

@@ -5,9 +5,10 @@
 #include <system.h>
     
 void print_call(char c);
-char get_call(void);
+char getc_call(void);
 void kill_call(void);
 void make_call(char c);
+void wait_call();
 
 
 /* lib/mem.c */ 

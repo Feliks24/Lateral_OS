@@ -125,7 +125,7 @@ void _exception_interrupt(void)
  	 * etwas verpassen.)
  	 */
  	st_handle_irq(); 
- 	dbgu_handle_irq(); 
+ 	//dbgu_handle_irq(); 
 }
  
 /*
