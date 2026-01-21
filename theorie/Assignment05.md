@@ -60,6 +60,7 @@ notwendig?)
 1. Maus 30 Abfragen in der Sekunde
 
 -> Taktzyklen insgesamt = Taktzyklen pro Abfrage * Abfragen = 400 * 30 = 12 000
+
 -> (12 * 10^3)/(2 * 10^8) = 6 * 10^-5 = 0,000006 ^= 0.0006% prozentuale CPU Auslastung
 
 2. Distkettenlaufwerk: 16-bit-Wörter mit Datenrate von 50 KB/sec
