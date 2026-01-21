@@ -3,7 +3,13 @@
  
 #include <stddef.h>
 #include <system.h>
- 
+    
+void print_call(char c);
+char get_call(void);
+void kill_call(void);
+void make_call(char c);
+
+
 /* lib/mem.c */ 
 void *memcpy(void *dest, const void *src, size_t n); 
  
@@ -11,7 +17,7 @@ void *memcpy(void *dest, const void *src, size_t n);
 __attribute__ ((format(printf,1,2)))
 void printf(char *format, ...); 
  
- 
+
  
 /*
  * barrier() - Compiler Optimization Barrier
@@ -40,7 +46,7 @@ static inline void busy_wait(unsigned int usec)
  		barrier(); 
 }
  
- 
+
 /*
  * BUG() und BUG_ON() - kritische Situationen prüfen und reagieren
  *
@@ -56,4 +62,3 @@ static inline void busy_wait(unsigned int usec)
 #define BUG_ON(cond) do { if (cond) BUG(); } while(0)
  
 #endif /* _LIB_H_ */
- 

@@ -24,7 +24,7 @@ OBJ += system/info.o
 OBJ += system/scheduler.o
 
 OBJ += driver/dbgu.o driver/mc.o driver/st.o driver/aic.o
-OBJ += lib/print.o lib/mem.o lib/list.o
+OBJ += lib/print.o lib/mem.o lib/list.o lib/sys_call.o
 OBJ += user/userthread.o
 
 #

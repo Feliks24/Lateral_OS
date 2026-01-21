@@ -197,34 +197,51 @@ void _exception_swi(unsigned int regs[16])
 
 		/* die letzten 24 bits ist die nummer des swi */
     		unsigned int swi_number = swi_instruction & 0x00FFFFFF;
+	
+		char c;
 		switch (swi_number)
 		{
 		case 1:
 			/* zeichen ausgeben */
-			printf("swi #1 called");
+			;
+			c = (char) regs[0];
+			//printf("%x", c);
+			dbgu_putc(c);
+			//printf("swi #1 called");
 			break;
 		case 2:
 			/* zeichen einlesen */
+			;
+			c = dbgu_getc();
+			regs[0]= c;
 			printf("swi #2 called");
+			break;
 		case 3:
 			/* thread beenden */
 			end_current_thread();
 			break;
 		case 4:
 			/* thread erstellen */
-			extern void test_print_thread
-			printf("swi #4 called");
+			c = (char) regs[0];
+			extern void test_print_thread(void* c);
+			start_new_thread(test_print_thread, &c, sizeof(c));
+			break;
 		case 5:
 			/* thread verzögern */
-			printf("swi #5 called");
+			//printf("swi #5 called");
+			//TODO: take it out of scheduler
+			busy_wait(5000000);
+			break;
 		default:
 			/* wenn der undefined swi called soll er beendet werden*/
   			end_current_thread(); 
+			break;
 		}
 
 
 		
  	} else {
+		printf("found non user mode swi");
  		if (regs[11] == 0xde00)
   			asm ("mov r11, #0; swi 0");
  		/*

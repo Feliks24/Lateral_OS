@@ -13,12 +13,19 @@ void test_print_thread(void *x)
 {
  	char c = *(char *)x; 
  	unsigned i;
- 
-  	for(i = 0; i < 64; i++) {
- 		printf("%c", c); 
-  		busy_wait(50000); 
- 	}
- 
+ 	if((unsigned int) c > 64 && (unsigned int) c < 91){
+
+  		for(i = 0; i < 64; i++) {
+ 			printf("%c", c); 
+  			busy_wait(50000); 
+ 		}
+	}
+	else{
+  		for(i = 0; i < 64; i++) {
+			print_call(c);
+			wait_call();
+ 		}
+	}
 #if 0
  	/* Das Programm zu Testzwecken abstürzen lassen */ 
  	if (c == 'D')
@@ -40,8 +47,10 @@ void test_print_thread_swi(void *x)
  	unsigned i;
  
   	for(i = 0; i < 64; i++) {
-		asm("MOV r0, 0x6");
-		asm("swi #1");	
+		//sys call to print
+		//register unsigned int r0_val asm("r0") = (unsigned int)c;
+		//asm volatile ("swi #1 \n": : "r" (r0_val));
+		//asm("swi #1");	
  		//printf("%c", c); 
 		asm("swi #5");
  	}

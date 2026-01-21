@@ -8,6 +8,15 @@
  *
  * Wird direkt nach Initialisierung des Supervisor-Stacks gestartet.
  */
+
+
+void user_program(){
+	while(1){
+		char c = getc_call();
+		make_call(c);
+	}
+}
+
 void start_kernel(void)
 {
  	/*
@@ -22,5 +31,7 @@ void start_kernel(void)
  	st_set_interval(500);
  
  	scheduler_init(); 
-	//asm("swi #1");
+
+	//start_new_thread(user_program, NULL, sizeof(NULL));
+	
 }
