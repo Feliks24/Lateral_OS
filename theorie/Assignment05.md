@@ -65,26 +65,39 @@ notwendig?)
 2. Distkettenlaufwerk: 16-bit-Wörter mit Datenrate von 50 KB/sec
 
 -> 50 KB/sec ^= 400 000 bit/sec
+
 -> 400 000/16 = 25 000 Wörter
+
 -> Man schafft 25 000 Wörter pro Sekunde
+
 -> pro Wort eine Polling Operation
+
 -> 25 000 * 400 = 10 000 000 ^= 10^7 Taktzyklen
+
 -> 10^7/(2 * 10^8) = 0.05 ^= 5% prozentuale CPU Auslastung
 
 3. Plattengeräte: 32-bit-Wörter, 2MB/sec Datenrate
 
 -> 2MB/sec ^= 16 000 000 bit = 1,6 * 10^7
+
 -> 16 000 000/32 = 500 000 Wörter pro Sekunde
+
 -> 500 000 * 400 = 200 000 000 = 2 * 10^8  Taktzyklen
+
 -> (2 * 10^8)/(2 * 10^8) = 1 ^= 100% prozentuale CPU Auslastung
 
 4. Plattengerät mit DMA: 4000 Takte init, 2000 Takte interrupt pro DMA 4KB
 
 -> 4000 Takte Initialisierung
+
 -> 4 KB ^= 32 000 bit
+
 -> 32 000/32 = 1000 Wörter pro Sekunde
+
 -> 4000 + 1000 * 2000 = 2 004 000
+
 -> 2 004 000/(2 * 10^8) = 0,01002 ^= 1,002% prozentuale CPU Auslastung 
+
 -> hier wird die Rate von dem Plattengerät ignoriert da die Datenrate pro DMA
 niedriger ist und somit der Bottleneck ist
 
