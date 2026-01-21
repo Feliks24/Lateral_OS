@@ -20,19 +20,20 @@ LSCRIPT = kernel.lds
 OBJ =  system/entry.o system/start.o
 OBJ += system/exceptions.o system/exceptions_asm.o
 OBJ += system/cpu.o system/cpu_asm.o
-OBJ += system/info.o 
-OBJ += lib/boot_title.o
-OBJ += driver/dbgu.o driver/mc.o
-OBJ += lib/print.o lib/mem.o
-OBJ += system/timer.o system/asm_timer.o driver/aic.o
+OBJ += system/info.o
 OBJ += system/scheduler.o
+
+OBJ += driver/dbgu.o driver/mc.o driver/st.o driver/aic.o
+OBJ += lib/print.o lib/mem.o lib/list.o
+OBJ += user/userthread.o
+
 #
 # Konfiguration
 #
-
 CC = /home/mi/linnert/arm/bin/arm-none-eabi-gcc
 LD = /home/mi/linnert/arm/bin/arm-none-eabi-ld
 OBJCOPY = /home/mi/linnert/arm/bin/arm-none-eabi-objcopy
+
 
 CFLAGS = -Wall -Wextra -ffreestanding -mcpu=arm920t -O2
 CPPFLAGS = -Iinclude

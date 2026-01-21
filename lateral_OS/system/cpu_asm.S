@@ -1,7 +1,7 @@
 /*
- * _set_stack() - setzt den Stack eines priviligierten Modus neu
+ * _set_stack() - setzt den Stack eines privilegierten Modus neu
  *
- * @r0:	priviligierter Modus
+ * @r0:	privilegierter Modus
  * @r1: neuer Wert für SP im entsprechenden Modus
  *
  * Soll der Stack des User-Modus geändert werden, muss der System-Modus
@@ -11,7 +11,7 @@
 _set_stack:
  	/*
  	 * In gewünschten Modus wechseln (mittels Read-Modify-Write, 
- 	 * siehe AARM A4.1.39), alten Wert von CPRS in r2 halten.
+ 	 * siehe AARM A4.1.39), alten Wert von CPSR in r2 halten.
  	 */
   	mrs	r2, cpsr
  	bic	r3, r2, #0x1f
@@ -29,7 +29,7 @@ _set_stack:
 /*
  * _get_banked_sp_lr() - modusspezifische Register SP und LR auslesen
  *
- * @r0: priviligierter Modus
+ * @r0: privilegierter Modus
  * @r1: Zeiger auf Speicher, wo SP und LR gespeichert werden sollen
  *
  * Diese Funktion hat keine Sicherheitschecks! Siehe get_banked_sp_lr().
@@ -38,7 +38,7 @@ _set_stack:
 _get_banked_sp_lr:
  	/*
  	 * In gewünschten Modus wechseln (mittels Read-Modify-Write, 
- 	 * siehe AARM A4.1.39), alten Wert von CPRS in r2 halten.
+ 	 * siehe AARM A4.1.39), alten Wert von CPSR in r2 halten.
  	 */
   	mrs	r2, cpsr
  	bic	r3, r2, #0x1f
@@ -53,8 +53,20 @@ _get_banked_sp_lr:
  
   	mov	pc, lr
  
+/* get_banked_spsr() - modusspezifisches SPSR auslesen */ 
+.global get_banked_spsr
+get_banked_spsr:
+  	mrs	r2, cpsr
+ 	bic	r3, r2, #0x1f
+ 	orr	r3, r3, r0
+  	msr	cpsr_c, r3
  
-/* get_cpsr() - CPSR des aktuellen CPU-Modus auslesen */ 
+  	mrs	r0, spsr
+ 
+  	msr	cpsr_c, r2
+  	mov	pc, lr
+ 
+/* get_cpsr() - CPSR auslesen */ 
 .global get_cpsr
 get_cpsr:
   	mrs	r0, cpsr
@@ -66,6 +78,14 @@ get_cpsr:
 get_spsr:
   	mrs	r0, spsr
   	mov	pc, lr
+ 
+ 
+/* set_spsr() - SPSR des aktuellen CPU-Modus schreiben */ 
+.global set_spsr
+set_spsr:
+  	msr	spsr, r0
+  	mov	pc, lr
+ 
  
 /*
  * calc_store_pc_offset() - PC-Offset bei STM/STR ausrechnen
@@ -82,3 +102,35 @@ calc_store_pc_offset:
  	sub	r0, r0, r1
   	mov	pc, lr
  
+/* disable_irq() - I-Flag in CPSR setzen */ 
+.global disable_irq
+disable_irq:
+  	mrs	r0, cpsr
+ 	orr	r0, r0, #(1 << 7)
+  	msr	cpsr_c, r0
+  	mov	pc, lr
+ 
+/* enable_irq() - I-Flag in CPSR löschen */ 
+.global enable_irq
+enable_irq:
+  	mrs	r0, cpsr
+ 	bic	r0, r0, #(1 << 7)
+  	msr	cpsr_c, r0
+  	mov	pc, lr
+ 
+/* irq_disabled() - Testet, ob Interrupts maskiert */ 
+.global irq_disabled
+irq_disabled:
+  	mrs	r0, cpsr
+  	and	r0, r0, #(1 << 7)
+  	mov	pc, lr
+ 
+/*
+ * idle() - Idle-Thread mit Stromsparmodus
+ *
+ * (siehe Kapitel 4.9 im ARM920T Handbuch: Wait for Interrupt)
+ */
+.global idle
+idle:
+ 	mcr	p15, 0, r0, c7, c0, 4
+ 	b	idle

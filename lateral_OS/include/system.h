@@ -26,63 +26,46 @@ enum psr_mode {
  	PSR_UND = 0x1b,
  	PSR_SYS = 0x1f,
 };
-
-
-
+ 
+/* user/userthread.c */ 
+__attribute__ ((noreturn))
+void terminate(void); 
+ 
 /* system/exceptions.c */ 
 void init_exceptions(void); 
  
 /* system/info.c */
-void print_debug_info(unsigned int regs[16]); 
+void print_thread_info(unsigned int regs[16], enum psr cpsr); 
+void print_exception_info(unsigned int regs[16]); 
+ 
+__attribute__ ((noreturn))
+void print_bug_info(unsigned int regs[16], const char *func, const char *file, int line); 
+ 
+__attribute__ ((noreturn))
 void stop_execution(void); 
  
 /* system/cpu.c */ 
 void get_banked_sp_lr(enum psr_mode mode, unsigned int regs[2]); 
+enum psr get_banked_spsr(enum psr_mode mode); 
 void init_other_stacks(void); 
  
 /* system/cpu_asm.S */ 
 enum psr get_cpsr(void); 
 enum psr get_spsr(void);
+void set_spsr(enum psr spsr);
 int calc_store_pc_offset(void); 
+void disable_irq(void); 
+void enable_irq(void); 
+int irq_disabled(void); 
  
-void set_timer(unsigned int frequency);
-void check_interrupt();
-
-
-
-
-
-/*scheduler stuff start*/
-#define THREAD_NUM 16
-#define STACK_SIZE_PRIV 16
+__attribute__ ((noreturn))
+void idle(void); 
  
-struct tcb{
-        /* this should be printed */
-        unsigned int *priv_SP;
-        unsigned int thread_id;
-        char character;
-        unsigned int n;
-
-        /*
-                0 -> empty
-                1 -> running
-                2 -> ready
-                3 -> finished
-        */
-        unsigned int status;
-};
-
-
-struct tcb *current;
-unsigned int running_threads;
-unsigned int thread_stacks[THREAD_NUM][STACK_SIZE_PRIV];
-struct tcb all_tcbs[THREAD_NUM];
-void init_tcbs();
-//struct tcb make_thread(char character, unsigned int n, struct tcb *next);
-//void add_thread(char character, unsigned int n);
-//void pop_thread();
-
-
-/* scheduler stuff end*/
-
+/* system/scheduler.c */ 
+void scheduler_init(void); 
+void schedule(unsigned int regs[16]); 
+void request_reschedule(void); 
+int start_new_thread(void (*entry)(void *), const void *arg, unsigned int arg_size); 
+void end_current_thread(void); 
+ 
 #endif /* _SYSTEM_H_ */

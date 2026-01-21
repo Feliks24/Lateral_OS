@@ -40,6 +40,7 @@ static void print_psr(enum psr psr)
 static void print_banked_registers(void)
 {
  	unsigned int regs[6][2];
+  	enum psr psr[5];
  
  	get_banked_sp_lr(PSR_SVC, regs[0]); 
  	get_banked_sp_lr(PSR_FIQ, regs[1]); 
@@ -48,84 +49,143 @@ static void print_banked_registers(void)
  	get_banked_sp_lr(PSR_UND, regs[4]); 
  	get_banked_sp_lr(PSR_SYS, regs[5]); 
  
- 	printf(">>> Aktuelle modusspezifische Register (außer SPSR und R8-R12) <<<\n\n"
- 	       "                 SP           LR\n"
- 	       "Supervisor:  %p   %p\n"
- 	       "FIQ:         %p   %p\n"
- 	       "IRQ:         %p   %p\n"
- 	       "Abort:       %p   %p\n"
- 	       "Undefined:   %p   %p\n"
- 	       "User/System: %p   %p\n\n",
- 	       (void *)regs[0][0], (void *)regs[0][1],
- 	       (void *)regs[1][0], (void *)regs[1][1],
- 	       (void *)regs[2][0], (void *)regs[2][1],
- 	       (void *)regs[3][0], (void *)regs[3][1],
- 	       (void *)regs[4][0], (void *)regs[4][1],
+ 	psr[0] = get_banked_spsr(PSR_SVC); 
+ 	psr[1] = get_banked_spsr(PSR_FIQ); 
+ 	psr[2] = get_banked_spsr(PSR_IRQ); 
+ 	psr[3] = get_banked_spsr(PSR_ABT); 
+ 	psr[4] = get_banked_spsr(PSR_UND); 
+ 
+ 	printf(">>> Aktuelle modusspezifische Register (ausser R8-R12) <<<\n\n"
+ 	       "             ----SP----   ----LR----   -------SPSR--------\n"
+ 	       "Supervisor:  %p   %p   ",
+ 	       (void *)regs[0][0], (void *)regs[0][1]); 
+ 	print_psr(psr[0]);
+ 	printf("\nFIQ:         %p   %p   ",
+ 	       (void *)regs[1][0], (void *)regs[1][1]); 
+ 	print_psr(psr[1]);
+ 	printf("\nIRQ:         %p   %p   ",
+ 	       (void *)regs[2][0], (void *)regs[2][1]); 
+ 	print_psr(psr[2]);
+ 	printf("\nAbort:       %p   %p   ",
+ 	       (void *)regs[3][0], (void *)regs[3][1]); 
+ 	print_psr(psr[3]);
+ 	printf("\nUndefined:   %p   %p   ",
+ 	       (void *)regs[4][0], (void *)regs[4][1]); 
+ 	print_psr(psr[4]);
+ 	printf("\nUser/System: %p   %p\n\n",
  	       (void *)regs[5][0], (void *)regs[5][1]); 
 }
  
 static void print_registers(unsigned int regs[16])
 {
- 	printf(">>> Registerschnappschuss (aktueller Modus, angefertigt bei %p) <<<\n\n"
- 	       "R0:  %p    R4:  %p    R8:  %p    R12: %p\n"
+ 	printf("R0:  %p    R4:  %p    R8:  %p    R12: %p\n"
  	       "R1:  %p    R5:  %p    R9:  %p    SP:  %p\n"
  	       "R2:  %p    R6:  %p    R10: %p    LR:  %p\n"
- 	       "R3:  %p    R7:  %p    R11: %p    PC:  %p\n\n",
- 	       (void *)(regs[15] - calc_store_pc_offset()),
+ 	       "R3:  %p    R7:  %p    R11: %p    PC:  %p\n",
  	       (void *)regs[0], (void *)regs[4], (void *)regs[8],  (void *)regs[12],
  	       (void *)regs[1], (void *)regs[5], (void *)regs[9],  (void *)regs[13],
  	       (void *)regs[2], (void *)regs[6], (void *)regs[10], (void *)regs[14],
  	       (void *)regs[3], (void *)regs[7], (void *)regs[11], (void *)regs[15]); 
 }
  
+static void print_context(unsigned int regs[16], enum psr cpsr, enum psr spsr)
+{
+  	enum psr_mode cmode = cpsr & PSR_MODE; 
+ 
+ 	print_registers(regs);
+ 	printf("CPSR: ");
+ 	print_psr(cpsr);
+ 	if (cmode != PSR_USR && cmode != PSR_SYS) { 
+ 		printf("\nSPSR: ");
+ 		print_psr(spsr);
+ 	}
+ 	printf("\n");
+}
+/*
+ * print_thread_info() - Zustand eines User-Threads ausgeben
+ *
+ * @regs: gesicherte General-Purpose-Register des Threads
+ * @cpsr: gesichertes Statusregister des Threads
+ */
+void print_thread_info(unsigned int regs[16], enum psr cpsr)
+{
+ 	printf(">>> Thread-Kontext <<<\n\n"); 
+ 	print_context(regs, cpsr, 0); 
+}
  
 /*
- * print_debug_info() - aktuellen Systemzustand ausgeben
+ * print_exception_info() - aktuellen Systemzustand bei Ausnahme ausgeben
  *
- * @regs: gesicherte General-Purpose-Register des aktuellen Modus
- *
- * Nicht ganz perfekt, aber ein guter Anfang.
+ * @regs: gesicherte General-Purpose-Register
  */
-void print_debug_info(unsigned int regs[16])
+void print_exception_info(unsigned int regs[16])
+{
+  	enum psr cpsr = get_spsr();
+  	enum psr_mode cmode = cpsr & PSR_MODE; 
+  	enum psr spsr = get_banked_spsr(cmode); 
+  	enum psr_mode smode = spsr & PSR_MODE; 
+ 
+ 	/* Registersatz reparieren */ 
+ 	get_banked_sp_lr(cmode, &regs[13]); 
+ 
+ 	printf(">>> Kontext bei Feststellung der Ausnahme <<<\n\n"); 
+ 	print_context(regs, cpsr, spsr); 
+ 
+ 	if (smode == cmode)
+ 		printf("\n==> Exception aus demselben CPU-Modus: urspruengliches\n"
+ 		       "    LR und SPSR sind verloren gegangen!\n"); 
+ 	if (smode == PSR_FIQ && cmode != PSR_FIQ)
+ 		printf("\n==> Exception in FIQ-Modus: beim Kontext stimmen R8-R12 nicht!\n"); 
+ 
+ 	printf("\n");
+ 
+ 	print_banked_registers(); 
+}
+ 
+/*
+ * print_bug_info() - aktuellen Systemzustand bei BUG() ausgeben
+ *
+ * @regs: gesicherte General-Purpose-Register
+ * @func: __func__
+ * @file: __FILE__
+ * @line: __LINE__
+ */
+__attribute__ ((noreturn))
+void print_bug_info(unsigned int regs[16], const char *func, const char *file, int line)
 {
   	enum psr cpsr = get_cpsr(); 
   	enum psr_mode cmode = cpsr & PSR_MODE; 
+  	enum psr spsr = 0;
  
- 	/* normale Register */
- 	print_registers(regs);
+ 	/* Registersatz reparieren */ 
+ 	regs[15] -= calc_store_pc_offset(); 
  
- 	/* Statusregister im aktuellen Modus */ 
- 	printf(">>> Aktuelle Statusregister (SPSR des aktuellen Modus) <<<\n\n"
- 	       "CPSR: ");
- 	print_psr(cpsr);
- 	if (cmode != PSR_USR && cmode != PSR_SYS) { 
- 		/* SPSR ist nur in Ausnahmemodi verfügbar */ 
-  		enum psr spsr = get_spsr();
-  		enum psr_mode smode = spsr & PSR_MODE; 
+ 	if (cmode != PSR_USR && cmode != PSR_SYS)
+ 		spsr = get_spsr();
  
- 		printf("\nSPSR: ");
- 		print_psr(spsr);
+ 	printf("BUG in %s() (%s:%x)!\n\n", func, file, line);
  
- 		if (smode == cmode) { 
- 			printf("\n\n   ==> Exception aus demselben CPU-Modus, urspruengliches\n"
- 			       "       LR und SPSR sind verloren gegangen!"); 
- 		}
- 	}
- 	printf("\n\n");
+ 	printf(">>> Kontext nach Feststellung des Fehlers <<<\n\n"); 
+ 	print_context(regs, cpsr, spsr); 
+ 	printf("\n");
  
- 	/* ggf. modusspezifische Register (außer SPSR und R8-R12) */ 
- 	if (cmode != PSR_USR)
+ 	if (cmode != PSR_USR) { 
  		print_banked_registers(); 
- 	else
- 		printf("User-Modus => keine modusspezifischen Register abrufbar!\n\n"); 
+ 		stop_execution();
+ 	} else {
+ 		printf("Thread beendet.\n"); 
+ 		terminate();
+ 	}
 }
  
 /*
  * stop_execution() - System mit Meldung anhalten
  */
+__attribute__ ((noreturn))
 void stop_execution(void)
 {
  	printf("System angehalten.\n"); 
+ 	disable_irq(); 
  	while(1)
   		continue;
 }

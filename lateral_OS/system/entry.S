@@ -15,5 +15,17 @@ _start:
  	/* Nach C wechseln */ 
  	bl      start_kernel
  
- 	/* System anhalten, falls wir aus Versehen zurückkehren sollten */ 
-        b       stop_execution
+ 	/*
+ 	 * Der Scheduler bekommt ein Array aus 16 Werten übergeben.
+ 	 * Beim ersten Aufruf werden diese eh verworfen, also ist
+ 	 * deren Inhalt hier nicht wichtig.
+ 	 */
+ 	sub	sp, sp, #(16*4)
+  	mov	r0, sp
+ 	bl	schedule
+ 
+ 	/* Ersten Thread laden (Idle) und dabei IRQs erlauben */ 
+ 	ldmia	sp, {r0-r14}^
+ 	nop
+ 	add	sp, sp, #(15*4)
+ 	ldmfd	sp!, {pc}^
