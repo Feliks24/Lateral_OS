@@ -2,25 +2,30 @@
 
 by Feliks & Bennet
 
-## Task 03
+## Task 05
 
-For task 3 we first of all started with the solution code from task 2
-as our task 2 didn't work. We added some of our code, which is mainly
-print and cosmetic stuff. 
+We started with the example solution since ours didn't fully work last time.
 
-What we did:
+* in lateral_OS/lib/sys_call.c there are basically the library functions for
+  system calls that gets used for handling threads including print,getc, kill
+current thread, make thread, wait
+* the order of these calls is from 1 to 5, 1 being print and 5 wait
+* the library function basically mainly call swi #x with x being a number
+  between 1 and 5
+* for input and output we use the r0 register, where only getc needs an output
+* for the testing user thread the thread gets a character and checks if the
+  letter is capilized or not and based on that does a loop with printf and
+busy_wait or instead uses the library functions that are system calls
+* swi handling happens in lateral_OS/system/exception.c
+* take the number from swi by getting the swi command and extract the number
+* based on the number do different operations
+* print and getc are calls to dbgu
+* 4 calls start_new_thread with test_print_thread as input
+* 5 calls busy_wait; it's not a good solution but we didn't know better
+* 3 and default is end_current_thread function
+* we wanted to do a userprogram that starts then reads chars and starts threads
+  but it didn't work so we commented it out
 
-* Added system timer initialization in `system/timer.c` for periodic 
-  interrupts (configurable at `start.c`)
-* Implemented `dbgu_enable_interrupt()` in `driver/dbgu.c` for 
-  interrupt-driven character reception with a buffer 
-* Created AIC driver in `driver/aic.c` to configure and route interrupts
-* Added `_cpsr_interrupt_enable()` in `system/asm_timer.S` to unmask IRQs
-* Implemented `irq_trampoline` in `system/exceptions_asm.S` following 
-  AIC protocol (read IVR, call handler, write EOICR)
-* Extended `dbgu_init()` to enable receiver/transmitter 
-* Created test application in `system/start.c` that waits for keypresses 
-  and outputs characters, while timer interrupts print "!" every 1s
 
 ## Compiling
 
@@ -31,28 +36,6 @@ scripts as of 04.11.2025 sets library path, tries to compile C code, and
 execute the kernel with qemu and afterwards unsetting the library path as
 setting the library path breaks other programs such as vim(<3)
 
-by default we run our program with ./compile (while in the lateral_OS)
-directory. It may by accident that we submit a version that assumes gdb
-in which case either gdb has to be run or the make line in the file
-compile has to be changed to the commented out one.
+of course lateral_OS/compile needs to be made compilable with chmod +x compile
 
 
-## Scripts
-
-There are now multiple scripts to avoid typing the full commands.
-Mainly the compile script is used and the rest is hidden in the 
-scripts directory
-
-./compile -> set lib, make, run qemu, unset lib
-
-./gdb -> set lib, run gdb, unset lib
-
-./qemu -> set lib, run qemu, unset lib
-
-./libset and ./unlib
-
-## Theory
-
-For the theory part we used to do latex but we decided it's easier just
-to do Markdown instead. For every exercise we add a file with the
-solution into the 'theorie' directory.
