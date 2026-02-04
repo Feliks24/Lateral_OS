@@ -24,6 +24,8 @@ void start_kernel(void)
  
  	dbgu_init(); 
  	st_init();
+
+	mmu_init();
  
  	scheduler_init(); 
  

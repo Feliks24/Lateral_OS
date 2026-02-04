@@ -31,6 +31,7 @@ KOBJ += system/exceptions.o system/exceptions_asm.o
 KOBJ += system/cpu.o system/cpu_asm.o
 KOBJ += system/info.o
 KOBJ += system/scheduler.o
+KOBJ += system/mmu.o
 
 KOBJ += driver/dbgu.o driver/mc.o driver/st.o driver/aic.o
 KOBJ += lib/print.o lib/mem.o lib/list.o

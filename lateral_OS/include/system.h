@@ -66,5 +66,7 @@ void thread_wait_char(void);
 void thread_wait_slices(unsigned int slices); 
 void scheduler_tick(void); 
 void wakeup_charwait(void); 
+
+void mmu_init(void);
  
 #endif /* _SYSTEM_H_ */

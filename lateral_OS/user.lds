@@ -9,7 +9,7 @@
 ENTRY(main)
 SECTIONS
 {
-	. = 0x21000000;
+	. = 0x80000000;
 	.text : {
 		*(.text*)
 	}
