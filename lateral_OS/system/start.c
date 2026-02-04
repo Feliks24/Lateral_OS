@@ -4,19 +4,16 @@
 #include <st.h>
  
 /*
+ * Schwache Referenz auf die main()-Funktion der Anwendung. Falls keine
+ * Anwendung mitgelinkt wird, ist user_main 0.
+ */
+__attribute__ ((weakref("main"))) static void user_main(void *data); 
+ 
+/*
  * start_kernel() - unser C-Eintrittspunkt
  *
  * Wird direkt nach Initialisierung des Supervisor-Stacks gestartet.
  */
-
-
-void user_program(){
-	while(1){
-		char c = getc_call();
-		make_call(c);
-	}
-}
-
 void start_kernel(void)
 {
  	/*
@@ -26,12 +23,18 @@ void start_kernel(void)
   	init_exceptions();
  
  	dbgu_init(); 
- 
  	st_init();
- 	st_set_interval(500);
  
  	scheduler_init(); 
-
-	//start_new_thread(user_program, NULL, sizeof(NULL));
-	
+ 
+ 	/*
+ 	 * Initialen Thread starten.
+ 	 */
+ 	if (!user_main) {
+ 		printf("Kein initialer Thread!\n"); 
+ 		return;
+ 	}
+ 
+ 	if (start_new_thread(user_main, NULL, 0))
+ 		BUG();
 }

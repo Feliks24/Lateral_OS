@@ -60,3 +60,107 @@ void init_thread_stack(TCB_t *tcb, unsigned int *stack_base, void (*thread_func)
     // 2. Save the final stack pointer into the TCB
     tcb->stack_ptr = stk;
 }
+
+
+
+
+
+
+MMU
+
+-> make L1 table
+-> put L1-table point in TTB
+	-> page 49
+	-> CP15 Register 2, TTB
+	-> Pointer[31:14]
+-> set domain access control
+-> enable MMU
+	-> page 48
+	CP15 register 1, control
+	M bit = 1 -> MMU enable
+
+
+-> reduce complexity
+	-> deactivate caches in CP15 
+	-> set C and B bits to 0 in L1
+
+
+L1 Layout
+-> AP = 11 -> vollzugriff
+-> corrently AP = 01 -> user kein zugriff
+4096 x 4 bytes
+
+section base address[31:20]
+	-> ??
+	-> do some non 1:1 map idk
+	-> Identity mapping for
+		-> Internal memories
+		-> EBI chip select 1/ SDRAMC 
+		-> Internal Peripherals
+	-> maybe map 0x8000 -> 0x4000
+	
+empty[19:12]
+AP[11,10]
+	-> first 11, then 01
+empty[9]
+Domain[8:5]
+	-> perhaps 0000
+	-> groups an entry into some domain from 0-15
+	-> domain access can be changed
+		-> see page 50
+Bits[4:0]
+	-> 1 0 0 1 0
+	-> 1 C B 1 0
+		-> last 1 0 stands for SBA
+		-> section base address
+	-> set C B = 0 0
+
+
+Some memory notes
+
+Eintrittspunkts as per kernel.lds: 0x20000000
+#define STACK_BOTTOM 0x24000000
+#define INTERNAL_RAM ((void *)     0x00200000)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

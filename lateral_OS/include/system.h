@@ -27,10 +27,6 @@ enum psr_mode {
  	PSR_SYS = 0x1f,
 };
  
-/* user/userthread.c */ 
-__attribute__ ((noreturn))
-void terminate(void); 
- 
 /* system/exceptions.c */ 
 void init_exceptions(void); 
  
@@ -64,8 +60,11 @@ void idle(void);
 /* system/scheduler.c */ 
 void scheduler_init(void); 
 void schedule(unsigned int regs[16]); 
-void request_reschedule(void); 
 int start_new_thread(void (*entry)(void *), const void *arg, unsigned int arg_size); 
 void end_current_thread(void); 
+void thread_wait_char(void); 
+void thread_wait_slices(unsigned int slices); 
+void scheduler_tick(void); 
+void wakeup_charwait(void); 
  
 #endif /* _SYSTEM_H_ */

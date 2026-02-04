@@ -24,7 +24,7 @@ _start:
   	mov	r0, sp
  	bl	schedule
  
- 	/* Ersten Thread laden (Idle) und dabei IRQs erlauben */ 
+ 	/* Ersten Thread laden und dabei IRQs erlauben */ 
  	ldmia	sp, {r0-r14}^
  	nop
  	add	sp, sp, #(15*4)

@@ -1,69 +1,51 @@
-#include <lib.h>
+#include "userlib.h"
  
-/* Unser Thread beendet sich durch einen Software-Interrupt. */ 
-__attribute__ ((noreturn))
-void terminate(void)
+/*
+ * print_string() - String via Syscall ausgeben
+ *
+ * Noch kein printf(), aber das braucht unsere Anwendung auch noch nicht
+ * wirklich.
+ */
+static void print_string(char *s)
 {
-  	asm("swi #0");
- 	BUG();
+ 	while (*s)
+ 		putchar(*s++); 
 }
  
-/* Ein einfaches Testprogamm, was als Thread im Usermode ausgeführt werden soll */ 
-void test_print_thread(void *x)
+/*
+ * char_repeater() - geforderter Thread für Aufgabe 5
+ *
+ * Zeichen wiederholt mit Pausen ausgeben. Bei Großbuchstaben wird in den
+ * Pausen aktiv gewartet, bei allen anderen passiv.
+ */
+static void char_repeater(void *data)
 {
- 	char c = *(char *)x; 
- 	unsigned i;
- 	if((unsigned int) c > 64 && (unsigned int) c < 91){
-
-  		for(i = 0; i < 64; i++) {
- 			printf("%c", c); 
-  			busy_wait(50000); 
- 		}
-	}
-	else{
-  		for(i = 0; i < 64; i++) {
-			print_call(c);
-			wait_call();
- 		}
-	}
-#if 0
- 	/* Das Programm zu Testzwecken abstürzen lassen */ 
- 	if (c == 'D')
- 		*(int *)0xa0000000 = 0;
- 	else if (c == 'U')
-  		asm (".word 0xE7F000F0"); 
- 	else if (c == 'X')
-  		asm ("mov pc, #0x04"); 
- 	else if (c == 'B')
- 		BUG();
-#endif
-}
-
-/* Ein einfaches Testprogamm, was als Thread im Usermode ausgeführt werden soll */ 
-void test_print_thread_swi(void *x)
-{
-	/*das ausführen wenn klein buchstaben*/
- 	char c = *(char *)x; 
- 	unsigned i;
+ 	unsigned int i;
+ 	char c = *(unsigned int *)data; 
  
-  	for(i = 0; i < 64; i++) {
-		//sys call to print
-		//register unsigned int r0_val asm("r0") = (unsigned int)c;
-		//asm volatile ("swi #1 \n": : "r" (r0_val));
-		//asm("swi #1");	
- 		//printf("%c", c); 
-		asm("swi #5");
+  	for (i = 0; i < 10; i++) {
+ 		putchar(c); 
+ 		if (c >= 'A' && c <= 'Z')
+  			busy_wait(500000); 
+ 		else
+ 			wait(10);
  	}
  
-#if 0
- 	/* Das Programm zu Testzwecken abstürzen lassen */ 
- 	if (c == 'D')
- 		*(int *)0xa0000000 = 0;
- 	else if (c == 'U')
-  		asm (".word 0xE7F000F0"); 
- 	else if (c == 'X')
-  		asm ("mov pc, #0x04"); 
- 	else if (c == 'B')
- 		BUG();
-#endif
+  	exit();
+}
+ 
+/*
+ * main() - Hauptthread für Aufgabe 5
+ *
+ * Für jede Taste wird ein Thread geforkt.
+ */
+void main(void *data)
+{
+ 	(void)data; /* Unbenutztes Argument */ 
+ 
+ 	while (1) {
+ 		char c = getchar(); 
+ 		if (fork(char_repeater, c))
+ 			print_string("Fehler bei Thread-Erzeugung!\n"); 
+ 	}
 }

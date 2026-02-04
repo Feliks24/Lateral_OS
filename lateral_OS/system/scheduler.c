@@ -3,37 +3,38 @@
 #include <lib.h>
 #include <stddef.h>
 #include <st.h>
+#include <dbgu.h>
 #include "memlayout.h"
  
 #define MAX_THREADS 16
-#define SCHEDULER_TIMESLIZE_MS 500
+#define SCHEDULER_TIMESLIZE_MS 50
  
 enum thread_status { 
- 	thread_finished = 0,
- 	thread_ready,
- 	thread_is_idle_process,
+ 	THREAD_FINISHED = 0,
+ 	THREAD_READY,
+ 	THREAD_RUNNING,
+ 	THREAD_IDLE,
+ 	THREAD_BLOCKED,
 };
  
 struct tcb { 
  	struct list_node node; 
  
  	/* Verwaltungsdaten */ 
- 	unsigned thread_id; 
- 	unsigned stack_bottom; 
- 	unsigned stack_size; 
+ 	unsigned int thread_id; 
+ 	unsigned int stack_bottom; 
+ 	unsigned int waitslices; 
   	enum thread_status status; 
  
  	/* Kontext des Threads */ 
- 	unsigned psr;
- 	unsigned registers[16];
+  	enum psr psr;
+ 	unsigned int registers[16];
 };
  
 /* Makros um die Verwendung der Listenfunktionen zu vereinfachen */ 
 #define LIST_BASE(X) ((struct list_node **)(&(X)))
 #define LIST_NODE(X) (&((X).node))
 #define TCB(X)       ((struct tcb *)(X))
- 
-#define IDLE	(&idle_thread)
  
 /* reschedule_request = 1 veranlasst einen Prozesswechsel, falls möglich */ 
 static unsigned reschedule_request; 
@@ -42,38 +43,39 @@ static struct tcb idle_thread;
 static struct tcb user_threads[MAX_THREADS]; 
  
 /* Zeiger auf genau einen laufenden thread */ 
-static struct tcb *running_thread   = NULL; 
+static struct tcb *running_thread    = NULL; 
  
 /* Listen von Threads in dem jeweiligen Zustand */ 
-static struct tcb *threads_ready    = NULL; 
-static struct tcb *threads_finished = NULL; 
+static struct tcb *threads_ready     = NULL; 
+static struct tcb *threads_finished  = NULL; 
+static struct tcb *threads_charwait  = NULL; 
+static struct tcb *threads_slicewait = NULL; 
+ 
+static void request_reschedule(void)
+{
+ 	reschedule_request = 1; 
+}
  
 /* Initialisierung des Schedulers */ 
 void scheduler_init(void)
 {
   	int i;
  
- 	idle_thread.status	  = thread_is_idle_process; 
+ 	idle_thread.status	  = THREAD_IDLE; 
  	idle_thread.registers[15] = (unsigned int)idle; 
- 	idle_thread.psr		  = (unsigned int)PSR_SYS; 
+ 	idle_thread.psr		  = PSR_SYS; 
  
   	for (i = 0; i < MAX_THREADS; i++) {
  		user_threads[i].thread_id	= i; 
- 		user_threads[i].status		= thread_finished; 
+ 		user_threads[i].status		= THREAD_FINISHED; 
  		user_threads[i].stack_bottom	= USER_STACK_BOTTOM - i * USER_STACK_SIZE; 
- 		user_threads[i].stack_size	= USER_STACK_SIZE; 
  		list_push_back(LIST_BASE(threads_finished), LIST_NODE(user_threads[i])); 
  	}
  	request_reschedule(); 
 }
  
-void request_reschedule(void)
-{
- 	reschedule_request = 1; 
-}
- 
 /*
- * schedule() - eine einfacher Round-Robin-Scheduler
+ * schedule() - ein einfacher Round-Robin-Scheduler
  *
  * @regs: Die Inhalte der General-Purpose-Register des unterbrochenen Threads.
  *
@@ -86,54 +88,33 @@ void schedule(unsigned int regs[16])
  	if (!reschedule_request)
  		return;
  
- 	struct tcb *interrupted_thread = running_thread; 
+ 	/* Alten Kontext sichern. Der Kontext vom Idle-Thread muss nicht gesichert werden. */ 
+ 	if (running_thread != NULL && running_thread->status != THREAD_IDLE) { 
+ 		if (running_thread->status == THREAD_RUNNING) { 
+ 			running_thread->status = THREAD_READY; 
+ 			list_push_back(LIST_BASE(threads_ready),
+ 				       LIST_NODE(*running_thread)); 
  
- 	if (interrupted_thread != NULL && interrupted_thread->status == thread_finished) { 
- 		/* Thread wurde beendet */ 
- 		running_thread = IDLE; 
- 	}
- 
- 	if (threads_ready != NULL) { 
- 		/* Falls andere Threads bereit sind einen neuen heraussuchen */ 
- 		running_thread = TCB(list_remove(LIST_BASE(threads_ready),
- 						LIST_NODE(*threads_ready))); 
- 	} else if (interrupted_thread == NULL) { 
- 		/*
- 		 * Scheduler wurde zum ersten Mal aufgerufen, aber es gibt noch
- 		 * keinen Thread zum Ausführen
- 		 */
- 		running_thread = IDLE; 
- 	}
- 
- 	if (running_thread != interrupted_thread) { 
- 		/* YAY, wir können einen Kontextwechsel machen :) */ 
- 		printf("\n");
- 
- 		if (interrupted_thread != NULL && interrupted_thread != IDLE) { 
- 			/* Alten Kontext sichern. Der Kontext vom IDLE Thread muss nicht gesichert werden. */ 
- 			memcpy(interrupted_thread->registers, regs, sizeof(unsigned[16])); 
-  			interrupted_thread->psr = get_spsr(); 
- 
- 			switch(interrupted_thread->status) { 
- 			case thread_finished:
- 				list_push_back(LIST_BASE(threads_finished),
- 					       LIST_NODE(*interrupted_thread)); 
-  				break; 
- 			case thread_ready:
- 				list_push_back(LIST_BASE(threads_ready),
- 					       LIST_NODE(*interrupted_thread)); 
-  				break; 
- 			case thread_is_idle_process:
- 			default:
- 				BUG();
- 			}
  		}
- 
- 		/* Neuen Kontext vorbereiten */
- 		memcpy(regs, running_thread->registers, sizeof(unsigned[16])); 
- 		set_spsr(running_thread->psr); 
+ 		memcpy(running_thread->registers, regs, sizeof(running_thread->registers)); 
+ 		running_thread->psr = get_spsr(); 
  	}
- 	/* Der Timer wird zurückgesetzt */ 
+ 
+ 	/* nächsten Thread heraussuchen */ 
+ 	if (threads_ready != NULL) { 
+ 		running_thread = TCB(list_remove(LIST_BASE(threads_ready),
+ 						 LIST_NODE(*threads_ready))); 
+ 		BUG_ON(running_thread->status != THREAD_READY); 
+ 		running_thread->status = THREAD_RUNNING; 
+ 	} else {
+ 		running_thread = &idle_thread; 
+ 	}
+ 
+ 	/* Neuen Kontext laden */ 
+ 	memcpy(regs, running_thread->registers, sizeof(running_thread->registers)); 
+ 	set_spsr(running_thread->psr); 
+ 
+ 	/* Time-Slice zurücksetzen */ 
  	st_set_interval(SCHEDULER_TIMESLIZE_MS);
  	reschedule_request = 0; 
 }
@@ -179,25 +160,58 @@ int start_new_thread(void (*entry)(void *), const void *arg, unsigned int arg_si
  	 * psr: User-Modus, alle anderen Bits auf Null => Interrupts aktiv
  	 * r0: Zeiger auf Argument (am oberen Ende des Stacks)
  	 * sp: Zeiger auf Stack (unterhalb des Arguments)
- 	 * lr: Rücksprung soll den Thread beenden => Terminate-Funktion
  	 * pc: übergebener Einsprungspunkt
  	 *
  	 * Rest 0: kein Informationsleck, bzw. falls der Thread frühzeitig
  	 * abstürzt ist der Register-Dump lesbarer.
+ 	 *
+ 	 * Insbesondere ist auch das Link-Register 0. Per Definition muss sich
+ 	 * ein Thread mittels SWI beenden. Das Link-Register sollte also nicht
+ 	 * benutzt werden.
  	 */
  	thread->psr = PSR_USR; 
  	thread->registers[0] = arg_position; 
   	for (i = 1; i < 13; i++)
  		thread->registers[i] = 0; 
  	thread->registers[13] = arg_position; 
- 	thread->registers[14] = (unsigned int)terminate; 
+ 	thread->registers[14] = 0; 
  	thread->registers[15] = (unsigned int)entry; 
  
  	/* Und in die Liste der auszuführenden Threads einfügen */ 
- 	thread->status = thread_ready; 
+ 	thread->status = THREAD_READY; 
  	list_push_front(LIST_BASE(threads_ready), LIST_NODE(*thread)); 
  
  	return 0;
+}
+ 
+static void check_slicewait_threads(void)
+{
+ 	if (threads_slicewait == NULL)
+ 		return;
+ 
+ 	/*
+ 	 * Liste schlafender Threads durchgehen und waitslices decrementieren,
+ 	 * wenn Zähler 0 erreicht Thread aufwecken.
+ 	 */
+ 	struct tcb *t = threads_slicewait; 
+  	do {
+ 		t = TCB(t->node.next);
+ 		t->waitslices--; 
+ 		if (t->waitslices)
+  			continue;
+ 
+ 		/* nächsten Thread merken wegen Listenmanipulation */ 
+ 		struct tcb *n = TCB(t->node.next); 
+ 
+ 		/* Aufwecken */
+ 		list_remove(LIST_BASE(threads_slicewait), LIST_NODE(*t)); 
+ 		BUG_ON(t->status != THREAD_BLOCKED);
+ 		t->status = THREAD_READY;
+ 		list_push_back(LIST_BASE(threads_ready), LIST_NODE(*t)); 
+ 
+ 		/* weiter mit nächstem Thread */ 
+ 		t = n;
+ 	} while (threads_slicewait != NULL && t != threads_slicewait); 
 }
  
 /*
@@ -205,8 +219,60 @@ int start_new_thread(void (*entry)(void *), const void *arg, unsigned int arg_si
  */
 void end_current_thread(void)
 {
- 	BUG_ON(running_thread == NULL || running_thread == IDLE); 
- 	running_thread->status = thread_finished; 
+ 	BUG_ON(running_thread == NULL); 
+ 	BUG_ON(running_thread->status != THREAD_RUNNING); 
+ 
+ 	running_thread->status = THREAD_FINISHED; 
+ 	list_push_back(LIST_BASE(threads_finished), LIST_NODE(*running_thread)); 
  	request_reschedule(); 
 }
  
+void thread_wait_char(void)
+{
+ 	BUG_ON(running_thread == NULL); 
+ 	BUG_ON(running_thread->status != THREAD_RUNNING); 
+ 
+ 	running_thread->status = THREAD_BLOCKED; 
+ 	list_push_back(LIST_BASE(threads_charwait), LIST_NODE(*running_thread)); 
+ 	request_reschedule(); 
+}
+ 
+void thread_wait_slices(unsigned int slices)
+{
+ 	BUG_ON(running_thread == NULL); 
+ 	BUG_ON(running_thread->status != THREAD_RUNNING); 
+ 
+ 	if (slices) {
+ 		running_thread->status = THREAD_BLOCKED; 
+ 		list_push_back(LIST_BASE(threads_slicewait), LIST_NODE(*running_thread)); 
+ 		running_thread->waitslices = slices; 
+ 	}
+ 	request_reschedule(); 
+}
+ 
+void wakeup_charwait(void)
+{
+ 	BUG_ON(!dbgu_has_char()); 
+ 
+ 	if (!threads_charwait)
+ 		return;
+ 
+ 	/* Ein wartender Thread kann aufgeweckt werden */ 
+ 	struct tcb *t = TCB(list_remove(LIST_BASE(threads_charwait),
+ 					LIST_NODE(*threads_charwait))); 
+ 	BUG_ON(t->status != THREAD_BLOCKED);
+ 	t->status = THREAD_READY;
+ 
+ 	/* Rückgabewert für SWI setzen */ 
+ 	t->registers[0] = dbgu_getc(); 
+ 
+ 	/* Thread bevorzugt behandeln: vorne einfügen + Kontextwechsel */ 
+ 	list_push_front(LIST_BASE(threads_ready), LIST_NODE(*t)); 
+ 	request_reschedule(); 
+}
+ 
+void scheduler_tick(void)
+{
+ 	check_slicewait_threads(); 
+ 	request_reschedule(); 
+}

@@ -10,30 +10,42 @@
 #
 # make clean	-- Löscht alle erzeugten Dateien.
 #
+#
+#
+#
+# für Aufgabe 5:
+#
+# make kernelonly install -- Baut Kernel-Variante ohne Userspace mit anschließender Installation
+# make useronly
+#
 
 
 #
 # Quellen
 #
 LSCRIPT = kernel.lds
+ULSCRIPT = user.lds
 
-OBJ =  system/entry.o system/start.o
-OBJ += system/exceptions.o system/exceptions_asm.o
-OBJ += system/cpu.o system/cpu_asm.o
-OBJ += system/info.o
-OBJ += system/scheduler.o
+KOBJ =  system/entry.o system/start.o
+KOBJ += system/exceptions.o system/exceptions_asm.o
+KOBJ += system/cpu.o system/cpu_asm.o
+KOBJ += system/info.o
+KOBJ += system/scheduler.o
 
-OBJ += driver/dbgu.o driver/mc.o driver/st.o driver/aic.o
-OBJ += lib/print.o lib/mem.o lib/list.o lib/sys_call.o
-OBJ += user/userthread.o
+KOBJ += driver/dbgu.o driver/mc.o driver/st.o driver/aic.o
+KOBJ += lib/print.o lib/mem.o lib/list.o
+
+UOBJ = user/userthread.o user/syscalls.o
+
+OBJ = $(KOBJ) $(UOBJ)
 
 #
 # Konfiguration
 #
+#
 CC = /home/mi/linnert/arm/bin/arm-none-eabi-gcc
 LD = /home/mi/linnert/arm/bin/arm-none-eabi-ld
 OBJCOPY = /home/mi/linnert/arm/bin/arm-none-eabi-objcopy
-
 
 CFLAGS = -Wall -Wextra -ffreestanding -mcpu=arm920t -O2
 CPPFLAGS = -Iinclude
@@ -73,3 +85,15 @@ clean:
 	rm -f kernel kernel.bin kernel.img
 	rm -f $(OBJ)
 	rm -f $(DEP)
+
+#
+# Regeln für Aufgabe 5
+#
+
+.PHONY: kernelonly
+kernelonly: $(LSCRIPT) $(KOBJ)
+	$(LD) -T$(LSCRIPT) -o kernel $(KOBJ) $(LIBGCC)
+
+.PHONY: useronly
+useronly: $(ULSCRIPT) $(UOBJ)
+	$(LD) -T$(ULSCRIPT) -o kernel $(UOBJ) $(LIBGCC)

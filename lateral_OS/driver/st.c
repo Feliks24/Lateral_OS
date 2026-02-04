@@ -57,8 +57,6 @@ void st_handle_irq(void)
 {
  	unsigned int sr = st->sr;
  
- 	if (sr & PITS) {
- 		printf("!");
- 		request_reschedule(); 
- 	}
+ 	if (sr & PITS)
+ 		scheduler_tick(); 
 }

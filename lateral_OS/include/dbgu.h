@@ -5,5 +5,6 @@ void dbgu_init(void);
 void dbgu_putc(char c); 
 char dbgu_getc(void); 
 void dbgu_handle_irq(void); 
+int dbgu_has_char(void); 
  
 #endif /* _DBGU_H_ */

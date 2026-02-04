@@ -24,7 +24,7 @@ SECTIONS
 
 	/* Dahinter kommt der ganze Rest. */
 	.text : {
-		*(.text)
+		*(.text*)
 	}
 }
 

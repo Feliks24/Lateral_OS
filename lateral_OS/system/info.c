@@ -160,7 +160,9 @@ void print_bug_info(unsigned int regs[16], const char *func, const char *file, i
  	/* Registersatz reparieren */ 
  	regs[15] -= calc_store_pc_offset(); 
  
- 	if (cmode != PSR_USR && cmode != PSR_SYS)
+ 	BUG_ON(cmode == PSR_USR); 
+ 
+ 	if (cmode != PSR_SYS)
  		spsr = get_spsr();
  
  	printf("BUG in %s() (%s:%x)!\n\n", func, file, line);
@@ -169,13 +171,8 @@ void print_bug_info(unsigned int regs[16], const char *func, const char *file, i
  	print_context(regs, cpsr, spsr); 
  	printf("\n");
  
- 	if (cmode != PSR_USR) { 
- 		print_banked_registers(); 
- 		stop_execution();
- 	} else {
- 		printf("Thread beendet.\n"); 
- 		terminate();
- 	}
+ 	print_banked_registers(); 
+ 	stop_execution();
 }
  
 /*

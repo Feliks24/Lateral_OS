@@ -3,6 +3,7 @@
 #include <mc.h>
 #include <dbgu.h>
 #include <st.h>
+#include <syscallids.h>
  
 #define INTERNAL_RAM ((void *)0x00200000)
  
@@ -181,74 +182,53 @@ void _exception_fault(unsigned int regs[16], enum exception e)
  *
  * @regs: Register des Usermodus
  *
- * Derzeit einzige Funktion: Beenden von User-Threads.
+ * Abhandeln von Syscalls
  */
 void _exception_swi(unsigned int regs[16])
 {
   	enum psr_mode mode = get_spsr() & PSR_MODE; 
  
- 	if(mode == PSR_USR) {
- 		/* SWI aus User-Modus aus ist gewollt: beende den Thread */ 
-
-		/* nehme die vorherige operation was ein swi #x  sein sollte */
-		unsigned int *instr_ptr = (unsigned int *)(regs[15] - 4);
-
-    		unsigned int swi_instruction = *instr_ptr;
-
-		/* die letzten 24 bits ist die nummer des swi */
-    		unsigned int swi_number = swi_instruction & 0x00FFFFFF;
-	
-		char c;
-		switch (swi_number)
-		{
-		case 1:
-			/* zeichen ausgeben */
-			;
-			c = (char) regs[0];
-			//printf("%x", c);
-			dbgu_putc(c);
-			//printf("swi #1 called");
-			break;
-		case 2:
-			/* zeichen einlesen */
-			;
-			c = dbgu_getc();
-			regs[0]= c;
-			printf("swi #2 called");
-			break;
-		case 3:
-			/* thread beenden */
-			end_current_thread();
-			break;
-		case 4:
-			/* thread erstellen */
-			c = (char) regs[0];
-			extern void test_print_thread(void* c);
-			start_new_thread(test_print_thread, &c, sizeof(c));
-			break;
-		case 5:
-			/* thread verzögern */
-			//printf("swi #5 called");
-			//TODO: take it out of scheduler
-			busy_wait(5000000);
-			break;
-		default:
-			/* wenn der undefined swi called soll er beendet werden*/
-  			end_current_thread(); 
-			break;
-		}
-
-
-		
- 	} else {
-		printf("found non user mode swi");
- 		if (regs[11] == 0xde00)
-  			asm ("mov r11, #0; swi 0");
+ 	if(mode != PSR_USR) {
  		/*
  		 * SWI durch Betriebssystem-Code ist ungewollt. Der PC zeigt
  		 * momentan auf die Instruktion nach dem SWI; für die Fehler-
  		 * ausgabe ändern wir das.
  		 */
+ 		regs[15] -= 4;
+ 		_exception_fault(regs, E_SWI); 
+ 	}
+ 
+ 	/*
+ 	 * SWI aus User-Modus aus ist gewollt: Syscall
+ 	 *
+ 	 * Wir ermitteln aus der SWI-Instruktion den Immediate-Operand, anhand
+ 	 * dessen festgelegt wird, welche Funktion gefragt ist und führen
+ 	 * anschließend die entsprechende Tätigkeit durch.
+ 	 */
+ 
+ 	unsigned int swi_code = (*(unsigned int *)(regs[15] - 4)) & 0x00ffffff; 
+ 
+ 	switch (swi_code) { 
+ 	case SWI_FORK:
+ 		regs[0] = start_new_thread((void (*)(void *))regs[0], &regs[1], 4); 
+  		break; 
+ 	case SWI_WAIT:
+ 		thread_wait_slices(regs[0]); 
+  		break; 
+ 	case SWI_EXIT:
+  		end_current_thread(); 
+  		break; 
+ 	case SWI_GETCHAR:
+ 		if (dbgu_has_char())
+ 			regs[0] = dbgu_getc(); 
+ 		else
+ 			thread_wait_char(); 
+  		break; 
+ 	case SWI_PUTCHAR:
+ 		dbgu_putc(regs[0]); 
+  		break; 
+ 	default:
+ 		/* Unbekannter Syscall => Fehlermeldung (analog zu oben) */ 
  		regs[15] -= 4;
  		_exception_fault(regs, E_SWI); 
  	}
